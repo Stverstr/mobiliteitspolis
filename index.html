@@ -93,6 +93,22 @@ table.mx{border-collapse:collapse;width:100%;min-width:520px}
 .chart{background:#fff;border:1px solid var(--line);border-radius:8px;padding:14px}
 .chart svg{width:100%;height:auto;display:block}
 footer{padding:0;margin-top:40px}
+.agebox{background:var(--soft);border-radius:8px;padding:16px 18px;margin-bottom:16px}
+.agelabel{display:block;font-family:var(--head);font-size:1.5rem;font-weight:700;color:var(--ink)}
+.agelabel output{color:var(--burgundy)}
+.agebox input{width:100%;accent-color:var(--burgundy)}
+.lifecards{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.lc{border:1px solid var(--line);border-radius:8px;padding:14px 16px;background:#fff}
+.lc-mob{border-color:var(--burgundy);border-width:2px}
+.lc h3{margin:0 0 8px;font-size:1.05rem;color:var(--burgundy)}
+.lc ul{margin:0 0 10px;padding-left:18px}
+.lc li{margin:2px 0}
+.lc .tot{font-family:var(--head);font-size:1.5rem;font-weight:700;color:var(--ink)}
+.lc .tot small{font-size:.9rem;font-weight:400;color:var(--muted)}
+.lc .warn{background:#fff1e6;border-left:3px solid var(--orange);padding:6px 10px;margin-top:10px;font-size:.92rem;color:var(--ink)}
+.lc .calm{background:var(--mist);border-left:3px solid var(--burgundy);padding:6px 10px;margin-top:10px;font-size:.92rem;color:var(--ink)}
+#timeline svg{cursor:pointer}
+@media (max-width:620px){.lifecards{grid-template-columns:1fr}}
 @media (max-width:820px){.cfg,.bc{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -110,6 +126,7 @@ footer{padding:0;margin-top:40px}
   <div class="tabs" role="tablist">
     <button class="tab" role="tab" aria-selected="true" aria-controls="v-gezin" id="t-gezin">Gezinscheck</button>
     <button class="tab" role="tab" aria-selected="false" aria-controls="v-bc" id="t-bc">Business case</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="v-life" id="t-life">Levensloop</button>
   </div>
 
   <section class="view" id="v-gezin" role="tabpanel" aria-labelledby="t-gezin">
@@ -164,6 +181,37 @@ footer{padding:0;margin-top:40px}
         <div class="kpis" id="kpis"></div>
         <div class="chart"><h2 style="margin:4px 4px 8px">Vijf jaar vooruit</h2><div id="chart"></div>
           <div class="legend" style="margin:8px 4px 0"><span><i class="dot" style="background:var(--blue);border-radius:2px"></i>Premie-inkomen</span><span><i class="dot" style="background:var(--orange)"></i>Technisch resultaat</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="view" id="v-life" role="tabpanel" aria-labelledby="t-life" hidden>
+    <div class="cfg">
+      <div>
+        <div class="panel">
+          <h2>Het leven van Noor</h2>
+          <p class="hint">Kies welke keuzes Noor maakt. Vóór haar 16de valt alles onder de polis van haar ouders.</p>
+          <div class="chips" id="lifeOpts" style="margin-bottom:4px"></div>
+        </div>
+        <div class="panel" id="lifeSliders"></div>
+      </div>
+      <div>
+        <div class="agebox">
+          <label for="age" class="agelabel">Noor is <output id="ageOut"></output> jaar</label>
+          <input type="range" id="age" min="16" max="85" step="1" value="23">
+        </div>
+        <div class="lifecards">
+          <div class="lc"><h3>Losse polissen</h3><div id="lcLoose"></div></div>
+          <div class="lc lc-mob"><h3>Mobiliteitspolis voor het leven</h3><div id="lcMob"></div></div>
+        </div>
+        <div class="chart" style="margin-top:16px"><h2 style="margin:4px 4px 2px">Een leven lang onderweg</h2>
+          <p class="hint" style="margin:0 4px 8px">Elke oranje stip is een nieuw contract: een moment waarop Noor gaat vergelijken. Tik op de tijdlijn om naar die leeftijd te springen.</p>
+          <div id="timeline"></div>
+        </div>
+        <div class="kpis" id="lifeKpis" style="margin-top:16px"></div>
+        <div class="chart"><h2 style="margin:4px 4px 8px">Verwachte premie per klant, opgeteld</h2><div id="lifeChart"></div>
+          <div class="legend" style="margin:8px 4px 0"><span><i class="dot" style="background:var(--burgundy)"></i>Mobiliteitspolis</span><span><i class="dot" style="background:#9aa5a8"></i>Losse polissen</span></div>
         </div>
       </div>
     </div>
@@ -451,6 +499,139 @@ function drawChart(yrs){
   s += '</svg>';
   document.getElementById('chart').innerHTML = s;
 }
+
+// ---------- levensloop ----------
+const LANES = ['Auto voor jongeren','Autoverzekering','Motorverzekering','Fietsverzekering','Zachte mobiliteit','Mobilhome'];
+const LOPTS = [
+  {id:'speed', label:'Speedpedelec als tiener', on:true},
+  {id:'kids', label:'Kinderen', on:true},
+  {id:'motor', label:'Motor', on:false},
+  {id:'camper', label:'Mobilhome na 58', on:true}
+];
+const LO = Object.fromEntries(LOPTS.map(o => [o.id, o.on]));
+const LSL = [
+  {id:'keuze', label:'Klant blijft bij een nieuw contract', min:20, max:95, step:1, val:75, fmt:n=>n+'%', sub:'Met losse polissen vergelijkt de klant opnieuw bij elk nieuw voertuig'},
+  {id:'jaar', label:'Jaarlijks klantbehoud', min:80, max:99, step:0.5, val:94, fmt:n=>n.toLocaleString('nl-BE')+'%', sub:'Voor beide modellen gelijk'},
+  {id:'korting', label:'Bundelkorting mobiliteitspolis', min:0, max:25, step:1, val:10, fmt:n=>n+'%'}
+];
+document.getElementById('lifeOpts').innerHTML = LOPTS.map(o => `<button class="chip" data-o="${o.id}" aria-pressed="${o.on}">${o.label}</button>`).join('');
+document.getElementById('lifeSliders').innerHTML = '<h2>Aannames</h2><p class="hint">Fictieve jaarpremies, bewust eenvoudig.</p>' + LSL.map(s => `
+  <div class="sl"><label for="l-${s.id}">${s.label}<output id="lo-${s.id}"></output></label>
+  <input type="range" id="l-${s.id}" min="${s.min}" max="${s.max}" step="${s.step}" value="${s.val}">${s.sub?`<small>${s.sub}</small>`:''}</div>`).join('');
+
+function lifeSegments(){
+  const g = [];
+  const add = (lane, from, to, label, prem) => g.push({lane, from, to, label, prem});
+  add(3,16,24,'Fiets',110);
+  if (LO.speed) add(4,16,19,'Speedpedelec',190);
+  add(0,18,24,'Eerste auto',1150);
+  add(1,25,79,'Auto',680);
+  if (LO.kids){ add(1,32,55,'Tweede auto',560); add(3,25,32,'Fiets',110); add(3,33,44,'Bakfiets',160); }
+  else add(3,25,44,'Fiets',110);
+  if (LO.motor) add(2,28,45,'Motor',380);
+  add(3,45,85,'E-bike',170);
+  if (LO.camper) add(5,58,74,'Mobilhome',520);
+  add(4,80,85,'Deelmobiliteit',60);
+  return g;
+}
+
+function lifeCalc(){
+  const v = {};
+  LSL.forEach(x => { v[x.id] = +document.getElementById('l-'+x.id).value; document.getElementById('lo-'+x.id).textContent = x.fmt(v[x.id]); });
+  const seg = lifeSegments();
+  const age = +document.getElementById('age').value;
+  document.getElementById('ageOut').textContent = age;
+  let pL=1, pM=1, cL=0, cM=0; const ser=[];
+  for (let a=16; a<=85; a++){
+    const act = seg.filter(x => a>=x.from && a<=x.to);
+    const starts = seg.filter(x => x.from===a && a>16).length;
+    pL *= Math.pow(v.keuze/100, starts);
+    const prem = act.reduce((t,x)=>t+x.prem,0);
+    cL += pL*prem; cM += pM*prem*(1-v.korting/100);
+    ser.push({a, cL, cM});
+    pL *= v.jaar/100; pM *= v.jaar/100;
+  }
+  const moments = seg.filter(x => x.from>16).length;
+  // kaarten
+  const act = seg.filter(x => age>=x.from && age<=x.to);
+  const prem = act.reduce((t,x)=>t+x.prem,0);
+  const nieuw = seg.filter(x => x.from===age && age>16);
+  const list = act.map(x => `<li>${x.label} <small style="color:var(--muted)">(${LANES[x.lane].toLowerCase()})</small></li>`).join('');
+  document.getElementById('lcLoose').innerHTML =
+    `<ul>${list}</ul><div class="tot">${act.length} ${act.length===1?'polis':'polissen'} <small>${eur(prem)} per jaar</small></div>` +
+    (nieuw.length ? `<div class="warn">Nieuw: ${nieuw.map(x=>x.label.toLowerCase()).join(' en ')}. Noor vraagt offertes op en kan hier vertrekken.</div>` : '');
+  document.getElementById('lcMob').innerHTML =
+    `<ul>${list}</ul><div class="tot">1 polis <small>${eur(prem*(1-v.korting/100)/12)} per maand</small></div>` +
+    (nieuw.length ? `<div class="calm">Nieuw: ${nieuw.map(x=>x.label.toLowerCase()).join(' en ')}. Noor voegt het toe in de app; de polis loopt gewoon door.</div>` : '');
+  const diff = cM - cL;
+  document.getElementById('lifeKpis').innerHTML =
+    `<div class="kpi"><b>${moments}</b><span>keuzemomenten in een leven met losse polissen</span></div>`+
+    `<div class="kpi"><b>${eur(cL)}</b><span>verwachte premie per klant, losse polissen</span></div>`+
+    `<div class="kpi"><b style="color:var(--burgundy)">${eur(cM)}</b><span>verwachte premie per klant, mobiliteitspolis</span></div>`+
+    `<div class="kpi"><b style="color:${diff>=0?'var(--ok)':'var(--bad)'}">${diff>=0?'+':'−'} ${Math.round(Math.abs(diff)/cL*100)}%</b><span>klantwaarde over het leven</span></div>`;
+  drawTimeline(seg, age);
+  drawLifeChart(ser, age);
+}
+
+const LX0=150, LX1=740, la = a => LX0 + (a-16)/(85-16)*(LX1-LX0);
+function drawTimeline(seg, age){
+  const lh=34, top=24, H = top + (LANES.length+1)*lh + 10;
+  let s = `<svg viewBox="0 0 760 ${H}" role="img" aria-label="Tijdlijn van Noors verzekeringen van 16 tot 85 jaar" id="tlsvg">`;
+  [16,20,30,40,50,60,70,80,85].forEach(a => {
+    s += `<text x="${la(a)}" y="14" font-size="11" fill="#6f6f6f" text-anchor="middle">${a}</text>`;
+    s += `<line x1="${la(a)}" x2="${la(a)}" y1="${top-4}" y2="${H-8}" stroke="#eef1f2"/>`;
+  });
+  LANES.concat(['Mobiliteitspolis']).forEach((n,i) => {
+    const y = top + i*lh;
+    const mob = i===LANES.length;
+    if (mob) s += `<line x1="0" x2="760" y1="${y-3}" y2="${y-3}" stroke="#d9dfe1"/>`;
+    s += `<text x="0" y="${y+lh/2+4}" font-size="13" fill="${mob?'#870930':'#2b2b2b'}" font-weight="${mob?700:400}">${n}</text>`;
+  });
+  seg.forEach(x => {
+    const y = top + x.lane*lh + 7, x0 = la(x.from), w = Math.max(6, la(x.to+1 > 85 ? 85 : x.to+1) - x0);
+    const yy = (x.lane===1 && x.label==='Tweede auto') ? y+11 : y;
+    const hh = (x.lane===1) ? 9 : 20;
+    s += `<rect x="${x0}" y="${yy}" width="${w}" height="${hh}" rx="4" fill="#addfe4"/>`;
+    if (x.lane!==1) s += `<text x="${x0+5}" y="${yy+14}" font-size="11" fill="#2b2b2b">${w>60?x.label:''}</text>`;
+    if (x.from>16) s += `<circle cx="${x0}" cy="${yy+hh/2}" r="5.5" fill="#ff6600" stroke="#fff" stroke-width="1.5"/>`;
+  });
+  const ym = top + LANES.length*lh + 7;
+  s += `<rect x="${la(16)}" y="${ym}" width="${la(85)-la(16)}" height="20" rx="4" fill="#870930"/>`;
+  s += `<text x="${la(16)+8}" y="${ym+14}" font-size="11" fill="#fff">Eén polis die meegroeit, zonder nieuwe keuzemomenten</text>`;
+  s += `<line x1="${la(age)+3}" x2="${la(age)+3}" y1="${top-6}" y2="${H-6}" stroke="#870930" stroke-width="2" stroke-dasharray="4 3"/>`;
+  s += '</svg>';
+  document.getElementById('timeline').innerHTML = s;
+}
+
+function drawLifeChart(ser, age){
+  const W=640,H=230,L=70,B=28,T=12,Rr=12;
+  const max = Math.max(...ser.map(p=>Math.max(p.cL,p.cM)),1);
+  const x = a => L + (a-16)/(85-16)*(W-L-Rr), y = n => T + (1-n/max)*(H-T-B);
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Opgetelde verwachte premie per leeftijd">`;
+  [0,max/2,max].forEach(t => { s += `<line x1="${L}" x2="${W-Rr}" y1="${y(t)}" y2="${y(t)}" stroke="#d9dfe1"/><text x="${L-8}" y="${y(t)+4}" font-size="12" fill="#6f6f6f" text-anchor="end">${eur(t)}</text>`; });
+  [20,30,40,50,60,70,80].forEach(a => s += `<text x="${x(a)}" y="${H-8}" font-size="12" fill="#6f6f6f" text-anchor="middle">${a}</text>`);
+  s += `<polyline fill="none" stroke="#9aa5a8" stroke-width="3" points="${ser.map(p=>x(p.a)+','+y(p.cL)).join(' ')}"/>`;
+  s += `<polyline fill="none" stroke="#870930" stroke-width="3" points="${ser.map(p=>x(p.a)+','+y(p.cM)).join(' ')}"/>`;
+  s += `<line x1="${x(age)}" x2="${x(age)}" y1="${T}" y2="${H-B}" stroke="#ff6600" stroke-width="1.5" stroke-dasharray="4 3"/>`;
+  s += '</svg>';
+  document.getElementById('lifeChart').innerHTML = s;
+}
+
+document.getElementById('lifeOpts').addEventListener('click', e => {
+  const b = e.target.closest('[data-o]'); if (!b) return;
+  LO[b.dataset.o] = !LO[b.dataset.o]; b.setAttribute('aria-pressed', LO[b.dataset.o]); lifeCalc();
+});
+document.getElementById('lifeSliders').addEventListener('input', lifeCalc);
+document.getElementById('age').addEventListener('input', lifeCalc);
+document.getElementById('timeline').addEventListener('click', e => {
+  const svg = e.currentTarget.querySelector('svg'); if (!svg) return;
+  const r = svg.getBoundingClientRect();
+  const vx = (e.clientX - r.left) / r.width * 760;
+  if (vx < LX0) return;
+  const a = Math.round(16 + (vx-LX0)/(LX1-LX0)*(85-16));
+  document.getElementById('age').value = Math.min(85, Math.max(16, a)); lifeCalc();
+});
+lifeCalc();
 
 renderAll();
 calc();
