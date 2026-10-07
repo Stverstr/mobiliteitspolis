@@ -25,13 +25,13 @@ header::after{z-index:0;content:"";position:absolute;right:-120px;top:-120px;wid
 h1{font-family:var(--head);font-weight:700;font-size:clamp(2.2rem,5vw,3.6rem);line-height:1.05;margin:0;max-width:18ch;color:#fff;position:relative}
 .lead{color:#f3dde4;max-width:60ch;font-size:1.15rem;margin:16px 0 36px;position:relative}
 .marking{height:5px;background:repeating-linear-gradient(90deg,var(--orange) 0 46px,transparent 46px 78px)}
-.tabs{display:flex;gap:4px;margin:28px 0 24px;border-bottom:1px solid var(--line)}
+.tabs{display:flex;gap:4px;margin:28px 0 24px;border-bottom:1px solid var(--line);flex-wrap:wrap}
 .tab{background:none;border:0;padding:10px 18px;font-family:var(--head);font-size:1.2rem;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:4px solid transparent;margin-bottom:-1px}
 .tab[aria-selected=true]{color:var(--burgundy);border-bottom-color:var(--orange)}
 .view[hidden]{display:none}
 h2{font-family:var(--head);font-weight:700;font-size:1.3rem;margin:0 0 2px;color:var(--burgundy)}
 .hint{color:var(--muted);font-size:.92rem;margin:0 0 12px}
-.cfg{display:grid;grid-template-columns:minmax(280px,360px) 1fr;gap:28px;align-items:start}
+.cfg{display:grid;grid-template-columns:minmax(280px,360px) minmax(0,1fr);gap:28px;align-items:start}
 .panel{background:var(--soft);border-radius:8px;padding:18px;margin-bottom:16px}
 .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:10px 0;border-top:1px solid var(--line)}
 .row:first-child{border-top:0;padding-top:0}
@@ -73,7 +73,7 @@ table.mx{border-collapse:collapse;width:100%;min-width:520px}
 .price{margin-top:16px;font-size:1.05rem;color:var(--ink)}
 .price b{font-family:var(--head);font-size:1.7rem;color:var(--burgundy)}
 .note{color:var(--muted);font-size:.85rem;margin-top:28px;max-width:70ch}
-.bc{display:grid;grid-template-columns:minmax(280px,360px) 1fr;gap:28px;align-items:start}
+.bc{display:grid;grid-template-columns:minmax(280px,360px) minmax(0,1fr);gap:28px;align-items:start}
 .sl{padding:10px 0;border-top:1px solid var(--line)}
 .sl:first-of-type{border-top:0}
 .sl label{display:flex;justify-content:space-between;gap:8px;font-weight:600;color:var(--ink)}
@@ -109,6 +109,9 @@ footer{padding:0;margin-top:40px}
 .lc .calm{background:var(--mist);border-left:3px solid var(--burgundy);padding:6px 10px;margin-top:10px;font-size:.92rem;color:var(--ink)}
 #timeline svg{cursor:pointer}
 @media (max-width:620px){.lifecards{grid-template-columns:1fr}}
+@media (max-width:760px){.cfg,.bc{grid-template-columns:minmax(0,1fr)}.row input[type=number]{width:80px}}
+.cfg>*,.bc>*,.panel{min-width:0}
+.row input[type=text]{min-width:0}
 .bundle{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-top:1px solid var(--line);color:var(--ink)}
 .bundle:first-child{border-top:0}
 .bundle b{font-family:var(--head);font-size:1.2rem;color:var(--burgundy);white-space:nowrap}
@@ -132,6 +135,7 @@ footer{padding:0;margin-top:40px}
 <header><div class="wrap">
   <h1>Eén verzekering voor alles waarmee uw gezin onderweg is</h1>
   <p class="lead">Auto, fiets, e-bike of speedpedelec: vandaag heeft elk voertuig zijn eigen polis, en daartussen vallen soms gaten. Ontdek in een paar klikken hoe goed uw gezin echt beschermd is, en wat één mobiliteitspolis voor u zou veranderen.</p>
+  <p style="position:relative;margin:0 0 36px"><a href="app.html" style="display:inline-block;background:var(--orange);color:#fff;text-decoration:none;font-weight:600;border-radius:6px;padding:10px 20px">Probeer de demo-omgeving (alle rollen) →</a></p>
   </div>
   <div class="marking" aria-hidden="true"></div>
 </header>
@@ -178,6 +182,7 @@ footer{padding:0;margin-top:40px}
           <span><i class="dot d-gap"></i>Niet gedekt</span>
           <span><i class="dot d-legal"></i>Wettelijk probleem</span>
         </div>
+        <p class="hint">De tabel toont de risico's voor de <b>personen</b>. Schade aan en diefstal van het voertuig zelf (omnium, fietsverzekering) zit in de mobiliteitspolis automatisch mee, tot de aankoopwaarde. Deelwagen (bv. Poppy), treinabonnement en leasefietsen passen ook in de polis — in het klantportaal van de demo-omgeving ziet u ze al ingevuld voor een voorbeeldgezin.</p>
         <div class="detail" id="detail" aria-live="polite"><p>Tik op een vakje voor de uitleg.</p></div>
         <div class="price" id="price"></div>
       </div>
@@ -197,6 +202,8 @@ footer{padding:0;margin-top:40px}
         <div class="chart"><h2 style="margin:4px 4px 8px">Vijf jaar vooruit</h2><div id="chart"></div>
           <div class="legend" style="margin:8px 4px 0"><span><i class="dot" style="background:var(--blue);border-radius:2px"></i>Premie-inkomen</span><span><i class="dot" style="background:var(--orange)"></i>Technisch resultaat</span></div>
         </div>
+        <div class="detail" style="margin-top:16px"><p><b>Gevoeligheid, zonder te schuiven:</b> bij een schadelast van 75% stijgt de combined ratio naar ±103% en wordt het vijfjaarsresultaat negatief. Ook de bundelkorting is niet gratis: rond ±20% korting nadert de ratio de 100% (de live knoppen staan in de demo-omgeving). En let wel: dit model rekent <b>zonder vaste kosten</b> (IT, structuur) — op kleine schaal zijn de uitkomsten daardoor te rooskleurig.</p></div>
+        <div class="detail" style="margin-top:12px"><p><b>Voorwaarden voor een go (werkpakketten volgende fase):</b> ① blijfkansonderzoek op echte P&amp;V-data (hoeveel klanten vertrekken er per voertuigmoment?), ② actuariële, risicogestuurde tarifering, ③ cannibalisatie- en IT-impactmodel, ④ juridische toetsing van de dekkingsregels (art. 29bis, attesten, eigen letsel).</p></div>
       </div>
     </div>
   </section>
@@ -225,6 +232,7 @@ footer{padding:0;margin-top:40px}
           <div id="timeline"></div>
         </div>
         <div class="kpis" id="lifeKpis" style="margin-top:16px"></div>
+        <p class="hint" style="margin:8px 4px 0">Let wel: de klantwaarde hierboven staat in <b>premie</b>. In marge (bij een combined ratio van ±90%, zie Business case) is elk bedrag ongeveer een tiende daarvan; het relatieve voordeel blijft gelijk, maar de bundelkorting van 10% drukt de marge per euro premie. Ter duiding van de gevoeligheid: bij 95% blijfkans is het voordeel nog ± +6%, bij 75% ± +91% — de schuif hierboven toont uw eigen scenario. Het volledige margemodel is werk voor actuariaat.</p>
         <div class="chart"><h2 style="margin:4px 4px 8px">Verwachte premie per klant, opgeteld</h2><div id="lifeChart"></div>
           <div class="legend" style="margin:8px 4px 0"><span><i class="dot" style="background:var(--burgundy)"></i>Mobiliteitspolis</span><span><i class="dot" style="background:#9aa5a8"></i>Losse polissen</span></div>
         </div>
@@ -277,8 +285,10 @@ footer{padding:0;margin-top:40px}
 <script>
 const VTYPES = {
   auto:{label:'Auto', price:45},
+  brommer:{label:'Brommer', price:12},
   speed:{label:'Speedpedelec', price:14},
   ebike:{label:'E-bike', price:9},
+  sportfiets:{label:'Sportfiets (MTB/gravel/koers)', price:7},
   fiets:{label:'Fiets', price:4},
   step:{label:'Elektrische step', price:3}
 };
@@ -287,7 +297,7 @@ const COVS = [
   {id:'familiale', label:'Familiale (BA privéleven)', sub:'Schade die je als fietser of voetganger aan anderen toebrengt'},
   {id:'bestuurder', label:'Bestuurdersverzekering', sub:'Eigen letsel als bestuurder van de wagen'},
   {id:'ongevallen', label:'Persoonlijke ongevallen', sub:'Eigen letsel, ongeacht het vervoermiddel'},
-  {id:'ba_speed', label:'BA speedpedelec', sub:'Verplicht, want een speedpedelec is een bromfiets'},
+  {id:'ba_speed', label:'BA bromfiets', sub:'Verplicht voor speedpedelec én brommer'},
   {id:'pech_auto', label:'Pechbijstand auto', sub:''},
   {id:'pech_fiets', label:'Fietsbijstand', sub:'Pechhulp voor fiets, e-bike en speedpedelec'}
 ];
@@ -319,27 +329,28 @@ const R = (st, txt) => ({st, txt});
 const has = id => S.covs.has(id);
 
 function rule(type, aspect){
+  const bromfiets = type === 'speed' || type === 'brommer';
   if (S.mode === 'mob'){
-    if (aspect === 'anderen' && type === 'speed') return R('ok','De verplichte BA voor de speedpedelec zit in de polis.');
+    if (aspect === 'anderen' && bromfiets) return R('ok','De verplichte BA voor de ' + (type==='speed'?'speedpedelec':'brommer') + ' zit in de polis.');
     return R('ok', {anderen:'Gedekt in de mobiliteitspolis, voor elk vervoermiddel van het gezin.',
                     letsel:'Eigen letsel gedekt, of je nu rijdt, fietst of stept.',
-                    pech:'Eén pechhulpnummer voor auto, fiets en step.'}[aspect]);
+                    pech:'Eén pechhulpnummer voor auto, brommer, fiets en step.'}[aspect]);
   }
-  const motor = type === 'auto' || type === 'speed';
+  const motor = type === 'auto' || bromfiets;
   if (aspect === 'anderen'){
     if (type === 'auto') return has('ba_auto') ? R('ok','Gedekt door de BA auto.') : R('legal','Zonder BA auto mag de wagen niet op de weg.');
-    if (type === 'speed') return has('ba_speed') ? R('ok','Gedekt door de BA speedpedelec.') : R('legal','Een speedpedelec is een bromfiets: een eigen BA is verplicht. De familiale dekt dit niet.');
+    if (bromfiets) return has('ba_speed') ? R('ok','Gedekt door de BA bromfiets.') : R('legal',(type==='speed'?'Een speedpedelec is een bromfiets: een':'Voor een brommer is een') + ' eigen BA verplicht. De familiale dekt dit niet.');
     return has('familiale') ? R('ok','Gedekt door de familiale.') : R('gap','Zonder familiale betaal je schade aan anderen zelf.');
   }
   if (aspect === 'letsel'){
     if (has('ongevallen')) return R('ok','Gedekt door de persoonlijke-ongevallenpolis.');
     if (type === 'auto') return has('bestuurder') ? R('ok','Gedekt door de bestuurdersverzekering.') : R('gap','De BA auto vergoedt nooit het letsel van de bestuurder zelf.');
-    if (type === 'speed') return R('gap','Als bestuurder van een motorvoertuig ben je geen zwakke weggebruiker: bij een ongeval zonder schuld van een ander krijg je niets.');
+    if (bromfiets) return R('gap','Als bestuurder van een motorvoertuig ben je geen zwakke weggebruiker: bij een ongeval zonder schuld van een ander krijg je niets.');
     return R('partial','Als zwakke weggebruiker vergoedt de autoverzekeraar je letsel bij een ongeval met een wagen. Val je alleen, dan niet.');
   }
   // pech
   if (type === 'auto') return has('pech_auto') ? R('ok','Gedekt door de pechbijstand.') : R('gap','Geen pechhulp voor de wagen.');
-  return has('pech_fiets') ? R('ok','Gedekt door de fietsbijstand.') : R('gap', motor ? 'De pechbijstand auto geldt niet voor de speedpedelec.' : 'Lekke band of kapotte ketting onderweg: je staat er alleen voor.');
+  return has('pech_fiets') ? R('ok','Gedekt door de fietsbijstand.') : R('gap', motor ? 'De pechbijstand auto geldt niet voor ' + (type==='speed'?'de speedpedelec':'de brommer') + '.' : 'Lekke band of kapotte ketting onderweg: je staat er alleen voor.');
 }
 
 function rows(){
@@ -489,8 +500,8 @@ const SL = [
   {id:'afsluit', label:'Afsluitgraad na vijf jaar', min:1, max:25, step:0.5, val:6, fmt:n=>n.toLocaleString('nl-BE')+'%'},
   {id:'premie', label:'Premie per gezin per maand', min:30, max:150, step:1, val:68, fmt:n=>'€ '+n},
   {id:'schade', label:'Schadelast', min:40, max:95, step:1, val:62, fmt:n=>n+'%', sub:'Deel van de premie dat naar schadegevallen gaat'},
-  {id:'comm', label:'Commissie en distributie', min:5, max:30, step:1, val:18, fmt:n=>n+'%'},
-  {id:'behoud', label:'Klantbehoud per jaar', min:70, max:98, step:1, val:88, fmt:n=>n+'%'}
+  {id:'comm', label:'Commissie en distributie', min:5, max:30, step:1, val:18, fmt:n=>n+'%', sub:'≈ kanaalcommissie (±15%, makelaarsbasis) + distributie-overhead (±3%) — zelfde opbouw als de demo-omgeving'},
+  {id:'behoud', label:'Klantbehoud per jaar', min:70, max:98, step:1, val:88, fmt:n=>n+'%', sub:'Gemengd behoud van een gróéiende portefeuille met veel verse klanten; het tabblad Levensloop rekent met 94% voor een gevestigde klantrelatie. Let wel: ook bij 98% behoud moet de gróéi naar 24.000 klanten zelf worden aangeworven — zie de aanwervings-KPI\'s'}
 ];
 const OPEX = 10;
 document.getElementById('sliders').innerHTML = '<h2>Aannames</h2><p class="hint">Beheerskosten staan vast op '+OPEX+'% van de premie.</p>' + SL.map(s => `
@@ -504,28 +515,33 @@ function calc(){
   const cr = v.schade + v.comm + OPEX;
   const target = v.markt * v.afsluit/100;
   const ret = v.behoud/100;
-  const yrs = []; let cust = 0, cum = 0;
+  const AANWERF = 150; // kost per nieuw aangeworven klant (fictief)
+  const yrs = []; let cust = 0, cum = 0, adds = 0;
   for (let y=1; y<=5; y++){
     const start = cust;
-    // aanwerving zodat het klantenbestand naar het doel groeit
+    // aanwerving zodat het klantenbestand naar het doel groeit; lager behoud = meer (dure) aanwerving
     const add = Math.max(0, (target*y/5) - start*ret);
-    cust = start*ret + add;
+    cust = start*ret + add; adds += add;
     const avg = (start + cust)/2;
     const prem = avg * v.premie * 12;
     const res = prem * (1 - cr/100);
     cum += res;
     yrs.push({y, cust, prem, res});
   }
+  const acqKost = adds * AANWERF;
   const col = cr < 95 ? 'var(--ok)' : cr <= 100 ? 'var(--partial)' : 'var(--bad)';
   document.getElementById('crVal').textContent = cr + '%';
   document.getElementById('crVal').style.color = col;
   const f = document.getElementById('crFill');
   f.style.width = Math.min(100, cr/150*100) + '%'; f.style.background = col;
   const y5 = yrs[4];
+  const netto = cum - acqKost;
   document.getElementById('kpis').innerHTML =
     `<div class="kpi"><b>${Math.round(y5.cust).toLocaleString('nl-BE')}</b><span>klanten in jaar 5</span></div>`+
     `<div class="kpi"><b>${big(y5.prem)}</b><span>premie-inkomen in jaar 5</span></div>`+
-    `<div class="kpi"><b style="color:${cum>=0?'var(--ok)':'var(--bad)'}">${big(cum)}</b><span>technisch resultaat over vijf jaar</span></div>`;
+    `<div class="kpi"><b style="color:${cum>=0?'var(--ok)':'var(--bad)'}">${big(cum)}</b><span>technisch resultaat over vijf jaar (vóór aanwervingskost)</span></div>`+
+    `<div class="kpi"><b>${Math.round(adds).toLocaleString('nl-BE')}</b><span>nieuw aan te werven klanten over vijf jaar — dit cijfer stijgt als het klantbehoud daalt</span></div>`+
+    `<div class="kpi"><b style="color:${netto>=0?'var(--ok)':'var(--bad)'}">${big(netto)}</b><span>resultaat ná aanwervingskost (€ ${AANWERF}/nieuwe klant, fictief)</span></div>`;
   drawChart(yrs);
 }
 
@@ -563,8 +579,8 @@ const LOPTS = [
 ];
 const LO = Object.fromEntries(LOPTS.map(o => [o.id, o.on]));
 const LSL = [
-  {id:'keuze', label:'Klant blijft bij een nieuw contract', min:20, max:95, step:1, val:75, fmt:n=>n+'%', sub:'Met losse polissen vergelijkt de klant opnieuw bij elk nieuw voertuig'},
-  {id:'jaar', label:'Jaarlijks klantbehoud', min:80, max:99, step:0.5, val:94, fmt:n=>n.toLocaleString('nl-BE')+'%', sub:'Voor beide modellen gelijk'},
+  {id:'keuze', label:'Klant blijft bij een nieuw contract', min:50, max:95, step:1, val:75, fmt:n=>n+'%', sub:'Met losse polissen vergelijkt de klant opnieuw bij elk nieuw voertuig. Bereik beperkt tot verdedigbare waarden (50-95%)'},
+  {id:'jaar', label:'Jaarlijks klantbehoud', min:80, max:97, step:0.5, val:94, fmt:n=>n.toLocaleString('nl-BE')+'%', sub:'Voor beide modellen gelijk'},
   {id:'korting', label:'Bundelkorting mobiliteitspolis', min:0, max:25, step:1, val:10, fmt:n=>n+'%'}
 ];
 document.getElementById('lifeOpts').innerHTML = LOPTS.map(o => `<button class="chip" data-o="${o.id}" aria-pressed="${o.on}">${o.label}</button>`).join('');

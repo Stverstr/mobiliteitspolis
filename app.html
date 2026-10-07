@@ -1,0 +1,1458 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mobiliteitspolis — demo-omgeving</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --burgundy:#870930; --orange:#ff6600; --blue:#addfe4;
+  --text:#4d4d4d; --ink:#2b2b2b; --muted:#6f6f6f; --bg:#f6f7f8; --card:#ffffff; --soft:#f4f4f4; --mist:#e2eaec; --line:#d9dfe1;
+  --ok:#2e8b57; --partial:#e39b17; --bad:#d13b2f;
+  --font:'Source Sans 3','Segoe UI',Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);font-size:16px;line-height:1.5}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
+h1,h2,h3{font-weight:700;color:var(--burgundy);line-height:1.15}
+h1{font-size:1.7rem;margin:0}
+h2{font-size:1.25rem;margin:0 0 10px}
+h3{font-size:1.05rem;margin:0 0 6px}
+a{color:var(--burgundy)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+.hint{color:var(--muted);font-size:.9rem;margin:2px 0 12px}
+.small{color:var(--muted);font-size:.85rem}
+.marking{height:5px;background:repeating-linear-gradient(90deg,var(--orange) 0 46px,transparent 46px 78px)}
+.btn{background:var(--burgundy);color:#fff;border:0;border-radius:6px;padding:10px 20px;font-weight:600;cursor:pointer}
+.btn:hover{background:#6d0727}
+.btn.sec{background:#fff;color:var(--burgundy);border:1.5px solid var(--burgundy)}
+.btn.sec:hover{background:var(--mist)}
+.btn.ghost{background:none;border:0;color:var(--burgundy);text-decoration:underline;padding:6px 8px}
+.btn.orange{background:var(--orange)}
+.btn.orange:hover{background:#e55a00}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px 20px;margin-bottom:16px;min-width:0}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
+.grid2>*{min-width:0}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;align-items:start}
+@media(max-width:760px){.grid2{grid-template-columns:minmax(0,1fr)}}
+.badge{display:inline-block;border-radius:999px;padding:2px 12px;font-size:.8rem;font-weight:600}
+.b-actief{background:#e2f3e9;color:var(--ok)}
+.b-offerte{background:#fdeeda;color:#a86b00}
+.b-wacht{background:#fdeeda;color:#a86b00}
+.b-prospect{background:var(--mist);color:var(--muted)}
+.scrollx{overflow-x:auto;max-width:100%}
+@media(max-width:480px){.scrollx table{font-size:.82rem}.scrollx th,.scrollx td{padding:6px 7px}}
+.tbl{border-collapse:collapse;width:100%}
+.tbl th,.tbl td{padding:8px 10px;text-align:left;border-top:1px solid var(--line);font-size:.93rem}
+.tbl thead th{border-top:0;background:var(--mist);color:var(--burgundy);font-weight:700}
+.tbl td.r,.tbl th.r{text-align:right;white-space:nowrap}
+.tbl tr.tot td{font-weight:700;color:var(--ink);border-top:2px solid var(--burgundy)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:16px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.kpi b{display:block;font-size:1.7rem;font-weight:700;line-height:1.15;color:var(--ink)}
+.kpi span{color:var(--muted);font-size:.85rem}
+.note{background:#fff8f2;border-left:4px solid var(--orange);padding:10px 14px;border-radius:0 8px 8px 0;font-size:.9rem;color:var(--ink);margin:10px 0}
+.calm{background:var(--mist);border-left:4px solid var(--burgundy);padding:10px 14px;border-radius:0 8px 8px 0;font-size:.9rem;color:var(--ink);margin:10px 0}
+/* login */
+#login{min-height:100vh;display:flex;flex-direction:column}
+.loghead{background:var(--burgundy);color:#fff;padding:42px 0 30px}
+.loghead h1{color:#fff;font-size:clamp(1.8rem,4vw,2.6rem);max-width:24ch}
+.loghead p{color:#f3dde4;max-width:62ch;margin:10px 0 0}
+.personas{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin:26px 0}
+.pcard{background:var(--card);border:2px solid var(--line);border-radius:12px;padding:16px;cursor:pointer;text-align:left;display:flex;gap:12px;align-items:flex-start}
+.pcard:hover{border-color:var(--orange)}
+.pcard[aria-pressed=true]{border-color:var(--burgundy);box-shadow:0 0 0 2px var(--burgundy) inset}
+.avatar{flex:none;width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.35rem;background:var(--mist)}
+.pcard b{display:block;color:var(--ink)}
+.pcard small{color:var(--muted);display:block;margin-top:2px}
+.logform{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px;max-width:430px;margin-bottom:40px}
+.logform label{display:block;font-weight:600;color:var(--ink);margin:10px 0 4px}
+.logform input{width:100%;border:1px solid var(--line);border-radius:6px;padding:9px 10px;background:#fff}
+/* app shell */
+#app{display:none;min-height:100vh}
+.topbar{background:var(--burgundy);color:#fff}
+.topbar .wrap{display:flex;align-items:center;gap:14px;padding:12px 20px;flex-wrap:wrap}
+.topbar .brand{font-weight:700;font-size:1.05rem}
+.topbar .who{margin-left:auto;display:flex;gap:10px;align-items:center;font-size:.9rem;flex-wrap:wrap}
+.topbar .who .avatar{width:34px;height:34px;font-size:1rem;background:rgba(255,255,255,.18)}
+.topbar button{background:none;border:1px solid rgba(255,255,255,.5);color:#fff;border-radius:6px;padding:5px 12px;cursor:pointer;font-size:.85rem}
+.topbar button:hover{background:rgba(255,255,255,.14)}
+.rolename{background:var(--orange);border-radius:999px;padding:2px 12px;font-size:.8rem;font-weight:600}
+nav.tabs{background:var(--card);border-bottom:1px solid var(--line)}
+nav.tabs .wrap{display:flex;gap:2px;flex-wrap:wrap}
+nav.tabs button{background:none;border:0;border-bottom:4px solid transparent;padding:12px 16px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;font-size:1rem}
+@media(max-width:640px){nav.tabs button{padding:10px 10px;font-size:.92rem}}
+nav.tabs button[aria-selected=true]{color:var(--burgundy);border-bottom-color:var(--orange)}
+main{padding:24px 0 60px}
+/* wizard */
+.steps{display:flex;gap:6px;margin:0 0 18px;flex-wrap:wrap}
+.step{display:flex;align-items:center;gap:7px;color:var(--muted);font-size:.88rem;font-weight:600}
+.step i{font-style:normal;width:26px;height:26px;border-radius:50%;background:var(--mist);display:inline-flex;align-items:center;justify-content:center}
+.step.cur{color:var(--burgundy)}.step.cur i{background:var(--orange);color:#fff}
+.step.done i{background:var(--ok);color:#fff}
+.step:not(:last-child)::after{content:"";width:26px;height:2px;background:var(--line);margin-left:6px}
+.fld{margin:10px 0}
+.fld label{display:block;font-weight:600;color:var(--ink);margin-bottom:4px}
+.fld input,.fld select{width:100%;max-width:340px;border:1px solid var(--line);border-radius:6px;padding:9px 10px;background:#fff}
+.choice{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0}
+.choice button{border:2px solid var(--line);background:#fff;border-radius:10px;padding:12px 16px;cursor:pointer;text-align:left;min-width:150px}
+.choice button[aria-pressed=true]{border-color:var(--burgundy);box-shadow:0 0 0 1px var(--burgundy) inset}
+.choice b{display:block;color:var(--ink)}
+.choice small{color:var(--muted)}
+/* signature modal */
+#sigmodal{position:fixed;inset:0;background:rgba(43,43,43,.55);display:none;align-items:center;justify-content:center;z-index:50;padding:16px}
+#sigmodal .box{background:#fff;border-radius:12px;padding:20px;max-width:520px;width:100%}
+#sigcanvas{border:2px dashed var(--line);border-radius:8px;width:100%;touch-action:none;background:#fff;cursor:crosshair}
+.sigbtns{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+/* documents */
+.doc{background:#fff;border:1px solid var(--line);border-radius:10px;padding:22px;margin-bottom:16px;max-width:720px}
+.doc .dochead{display:flex;justify-content:space-between;gap:10px;border-bottom:3px solid var(--burgundy);padding-bottom:10px;margin-bottom:12px;flex-wrap:wrap}
+.doc .dochead b{color:var(--burgundy);font-size:1.15rem}
+.greencard{border:3px solid var(--ok);background:#eef7f1;border-radius:10px;padding:18px;max-width:560px;margin-bottom:16px}
+.greencard h3{color:var(--ok)}
+.greencard table td{padding:3px 14px 3px 0;font-size:.92rem}
+.sigimg{max-height:70px;display:block}
+/* ecosystem */
+#eco svg{width:100%;height:auto;display:block}
+.econode{cursor:pointer}
+.econode:hover circle,.econode:hover rect{stroke:var(--orange);stroke-width:3}
+.ecodetail{background:var(--mist);border-left:4px solid var(--orange);padding:14px 16px;border-radius:0 8px 8px 0;min-height:90px}
+.flowlegend{display:flex;gap:18px;flex-wrap:wrap;font-size:.85rem;color:var(--muted);margin:8px 0}
+.flowlegend span{display:flex;align-items:center;gap:6px}
+.flowlegend i{width:22px;height:0;border-top:3px solid;display:inline-block}
+/* compare bars */
+.cmp{display:grid;grid-template-columns:150px 1fr auto;gap:6px 10px;align-items:center;margin:6px 0}
+.cmp .nm{font-weight:600;color:var(--ink);font-size:.9rem}
+.cmp .tr{background:var(--mist);border-radius:999px;height:16px;overflow:hidden}
+.cmp .fl{height:100%;border-radius:999px;background:#9aa5a8}
+.cmp .fl.pv{background:var(--burgundy)}
+.cmp .vl{font-size:.88rem;white-space:nowrap}
+.sl{padding:10px 0;border-top:1px solid var(--line)}
+.sl:first-of-type{border-top:0}
+.sl label{display:flex;justify-content:space-between;gap:8px;font-weight:600;color:var(--ink)}
+.sl output{font-weight:700;color:var(--burgundy)}
+.sl input{width:100%;accent-color:var(--burgundy)}
+.timeline{list-style:none;margin:0;padding:0}
+.timeline li{padding:6px 0 6px 20px;border-left:3px solid var(--mist);position:relative;font-size:.9rem}
+.timeline li::before{content:"";position:absolute;left:-7px;top:12px;width:11px;height:11px;border-radius:50%;background:var(--orange)}
+@media print{
+  .topbar,nav.tabs,.noprint{display:none !important}
+  body{background:#fff}
+  main{padding:0}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ LOGIN ============ -->
+<div id="login">
+  <div class="loghead"><div class="wrap">
+    <h1>Mobiliteitspolis — demo-omgeving</h1>
+    <p>Eén gezinspolis die personen volgt in plaats van voertuigen. Kies hieronder een rol: de gebruikersnaam en het wachtwoord worden automatisch ingevuld, zodat u meteen kunt demonstreren. Alle gegevens en premies zijn fictief.</p>
+  </div></div>
+  <div class="marking"></div>
+  <div class="wrap">
+    <div class="personas" id="personacards"></div>
+    <form class="logform" id="logform">
+      <h2>Aanmelden</h2>
+      <label for="lg_user">Gebruikersnaam</label>
+      <input id="lg_user" autocomplete="username" placeholder="kies eerst een rol hierboven">
+      <label for="lg_pass">Wachtwoord</label>
+      <input id="lg_pass" type="password" autocomplete="current-password" placeholder="demo">
+      <p class="small">Demo-omgeving: elk account gebruikt wachtwoord <b>demo</b>. Tip voor live demo's: klik na het aanmelden eerst op "Demo resetten" (rechtsboven) — eerdere demosessies op dit toestel werken anders door in de cijfers.</p>
+      <div style="display:flex;gap:10px;align-items:center;margin-top:8px">
+        <button class="btn" type="submit">Aanmelden</button>
+        <a href="index.html">Naar de pitchpagina</a>
+      </div>
+      <p class="small" id="logerr" style="color:var(--bad)"></p>
+    </form>
+  </div>
+</div>
+
+<!-- ============ APP ============ -->
+<div id="app">
+  <div class="topbar"><div class="wrap">
+    <span class="brand">Mobiliteitspolis</span>
+    <span class="rolename" id="rolename"></span>
+    <span class="who">
+      <span class="avatar" id="whoavatar"></span>
+      <span id="whoname"></span>
+      <button type="button" onclick="logout()">Wissel van rol</button>
+      <button type="button" onclick="resetDemo()">Demo resetten</button>
+    </span>
+  </div></div>
+  <div class="marking"></div>
+  <nav class="tabs"><div class="wrap" id="navtabs"></div></nav>
+  <main><div class="wrap" id="main"></div></main>
+</div>
+
+<!-- ============ SIGNATURE MODAL ============ -->
+<div id="sigmodal" role="dialog" aria-modal="true" aria-label="Onderteken">
+  <div class="box">
+    <h2 id="sigtitle">Onderteken</h2>
+    <p class="hint" id="sigsub">Teken uw handtekening in het kader (met muis of vinger).</p>
+    <div id="sigdocs"></div>
+    <p class="small">Teken hieronder in het kader. In de echte flow ondertekent de klant met <b>itsme of eID</b>; in deze demo volstaat een handtekening met muis of vinger.</p>
+    <canvas id="sigcanvas" width="460" height="160"></canvas>
+    <p class="small" id="sigerr" style="color:var(--bad);margin:6px 0 0" role="alert"></p>
+    <div class="sigbtns">
+      <button class="btn orange" onclick="sigConfirm()">Bevestig handtekening</button>
+      <button class="btn sec" onclick="sigClear()">Wissen</button>
+      <button class="btn ghost" onclick="sigClose(false)">Annuleren</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ================= basis ================= */
+const eur = n => '€ ' + (Math.round(n*100)/100).toLocaleString('nl-BE',{minimumFractionDigits:2,maximumFractionDigits:2});
+const eur0 = n => '€ ' + Math.round(n).toLocaleString('nl-BE');
+const eurM = n => eur(n) + '/maand';
+const esc = s => String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const DFMT = {day:'2-digit', month:'2-digit', year:'numeric'};
+const today = () => new Date().toLocaleDateString('nl-BE', DFMT);
+const plusDays = d => { const x=new Date(); x.setDate(x.getDate()+d); return x.toLocaleDateString('nl-BE', DFMT); };
+/* datums uit vrije invoer: dd/mm/jjjj of jjjj-mm-dd */
+function parseVerval(s){
+  let m = (s||'').match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if(m) return new Date(+m[3], +m[2]-1, +m[1]);
+  m = (s||'').match(/(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if(m) return new Date(+m[1], +m[2]-1, +m[3]);
+  return null;
+}
+const fmtVerval = s => { const d = parseVerval(s); return d ? d.toLocaleDateString('nl-BE', DFMT) : s; };
+const geldigTot = s => { const d = parseVerval(s); if(!d) return '30 dagen na verzending'; d.setDate(d.getDate()+30); return d.toLocaleDateString('nl-BE', DFMT); };
+let uid = 100; const nid = p => p + (uid++);
+
+/* voertuigtypes: alles waarmee een gezin onderweg is */
+const VT = {
+  auto:        {label:'Auto',                icon:'🚗', base:55, vf:0.00050, groen:true,  plate:true,
+    dek:'Verplichte BA + omnium tot de opgegeven waarde + bestuurdersdekking (eigen letsel) + pechbijstand.'},
+  brommer:     {label:'Brommer',             icon:'🛵', base:18, vf:0.00080, groen:true,  plate:true,
+    dek:'Verplichte BA + eigen letsel van de bestuurder + pech. Bestuurders van 16-17: jongerentoeslag zit in de premie en er gelden begeleidingsvoorwaarden (demo-aanname).'},
+  speedpedelec:{label:'Speedpedelec',        icon:'⚡', base:12, vf:0.00100, groen:true, plate:true,
+    dek:'Verplichte BA + eigen letsel + pech. Waarom BA? Een speedpedelec (tot 45 km/u) telt wettelijk als bromfiets; een gewone e-bike (tot 25 km/u) niet. Bij leasing dekt het leasecontract de schade aan de fiets zelf (casco).'},
+  ebike:       {label:'E-bike',              icon:'🔋', base:5.5, vf:0.00200, groen:false, plate:false,
+    dek:'Diefstal + schade + pech + eigen letsel (tot 25 km/u: geen BA-plicht).'},
+  sportfiets:  {label:'Sportfiets / e-MTB (MTB, gravel, koers)', icon:'🚴', base:5, vf:0.00220, groen:false, plate:false,
+    dek:'Diefstal + schade, ook bij sportief gebruik en mét trapondersteuning + pech + eigen letsel.'},
+  fiets:       {label:'Fiets',               icon:'🚲', base:4,  vf:0.00250, groen:false, plate:false,
+    dek:'Diefstal + schade + pech + eigen letsel.'},
+  step:        {label:'Elektrische step',    icon:'🛴', base:3,  vf:0.00020, groen:false, plate:false,
+    dek:'Aansprakelijkheid + eigen letsel + pech.'},
+  deelauto:    {label:'Deelwagen (bv. Poppy)',icon:'🔄', base:2, vf:0,       groen:false, plate:false,
+    dek:'Aanvulling op de verzekering van het deelplatform: eigen letsel + het eigen risico (vaak € 500 à € 1.000) dat het platform bij schade aanrekent, betalen wij.'},
+  ov:          {label:'Openbaar vervoer (abonnement)', icon:'🚆', base:1, vf:0, groen:false, plate:false,
+    dek:'Eigen letsel onderweg met trein, tram of bus, en op weg van en naar de halte.'}
+};
+/* referentieprijzen concurrentie (per jaar, bronnen in mobiliteitspolis.md; maart/jan 2026, vergelijkingssites) */
+const REF = {
+  fiets1000:[{n:'P&V Go', v:103.44},{n:'AG', v:102},{n:'Ethias', v:76.99}],
+  ebike2000:[{n:'P&V Go', v:107.40},{n:'AG', v:111},{n:'Ethias', v:113.76}],
+  autoBA:[{n:'Ethias', v:340},{n:'AG', v:486}]
+};
+
+/* ================= opslag ================= */
+const KEY = 'mobipolis_demo_v4';
+function seed(){
+  return {
+    products:{ bundel:10, comm:{makelaar:15, winkel:10, dealer:10, online:5}, schadelast:62, beheer:10, overhead:3, aanbreng:50,
+               prijsnota:'Fictieve demopremies: basisbedrag per voertuigtype + een opslag per euro waarde. Leasevoertuigen: −40% omdat de schadeverzekering (casco) al in het leasecontract zit. Demo-aannames dekking: franchise € 150, eigen letsel tot € 500.000 per persoon.' },
+    families:[
+      { id:'fam_peeters', name:'Gezin Peeters', email:'an.peeters@mail.be', status:'offerte', channel:'makelaar', beheerder:'Marc (makelaar)',
+        members:[{n:'An', r:'volwassene'},{n:'Tom', r:'volwassene'},{n:'Lotte (16)', r:'kind'},{n:'Seppe (14)', r:'kind'}],
+        vehicles:[
+          {id:'v1', type:'auto', label:'Gezinswagen', value:28000, lease:false, plate:'1-ABC-123', who:'An & Tom'},
+          {id:'v2', type:'speedpedelec', label:'Speedpedelec (leasing werkgever)', value:5500, lease:true, plate:'S-AAA-01', who:'An'},
+          {id:'v3', type:'sportfiets', label:'Mountainbike', value:3500, lease:false, who:'Tom'},
+          {id:'v4', type:'sportfiets', label:'Gravelbike', value:3000, lease:false, who:'Tom'},
+          {id:'v5', type:'sportfiets', label:'Koersfiets', value:4500, lease:false, who:'Tom'},
+          {id:'v6', type:'fiets', label:'Stadsfiets', value:600, lease:false, who:'Lotte (16)'},
+          {id:'v7', type:'brommer', label:'Brommer klasse B', value:2200, lease:false, plate:'S-BRO-16', who:'Lotte (16)'},
+          {id:'v8', type:'fiets', label:'Jeugdfiets', value:450, lease:false, who:'Seppe (14)'},
+          {id:'v9', type:'deelauto', label:'Poppy-abonnement', value:0, lease:false, who:'hele gezin'},
+          {id:'v10', type:'ov', label:'Treinabonnement', value:0, lease:false, who:'hele gezin'}
+        ],
+        huidig:[{n:'BA + omnium gezinswagen', v:95, verval:'01/03/2027'},{n:'Familiale', v:9, verval:'15/01/2027'},{n:'Fietsverzekering speedpedelec (via lease, inbegrepen)', v:0, verval:'loopt mee met het leasecontract'},{n:'Bromfietsverzekering Lotte', v:28, verval:'01/07/2027'},{n:'Pechbijstand auto', v:12, verval:'01/03/2027'}],
+        signature:null, signedAt:null, polisNr:null,
+        history:[{d:today(), t:'Offerte opgesteld door makelaar Marc en verstuurd naar An.'}] },
+      { id:'fam_janssens', name:'Gezin Janssens', email:'karen.janssens@mail.be', status:'actief', channel:'makelaar', beheerder:'Marc (makelaar)',
+        members:[{n:'Karen', r:'volwassene'},{n:'Peter', r:'volwassene'},{n:'Noor (10)', r:'kind'}],
+        vehicles:[
+          {id:'w1', type:'auto', label:'Gezinswagen', value:24000, lease:false, plate:'1-XYZ-789', who:'Karen & Peter'},
+          {id:'w2', type:'ebike', label:'E-bike', value:2800, lease:false, who:'Karen'},
+          {id:'w3', type:'ebike', label:'E-bike', value:2400, lease:false, who:'Peter'},
+          {id:'w4', type:'fiets', label:'Kinderfiets', value:300, lease:false, who:'Noor (10)'}
+        ],
+        huidig:[], signature:'(getekend in kantoor)', signedAt:'15/09/2026', polisNr:'MOB-2026-0001',
+        history:[{d:'15/09/2026', t:'Polis ondertekend bij makelaar Marc en meteen actief.'}] }
+    ],
+    log:[{d:today(), t:'Demo-omgeving gestart met voorbeeldgegevens.'}],
+    sales:[]
+  };
+}
+let DB;
+function load(){ try{ DB = JSON.parse(localStorage.getItem(KEY)) || seed(); }catch(e){ DB = seed(); } }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(DB)); }catch(e){} }
+function resetDemo(){ if(confirm('Demo terugzetten naar de begintoestand?')){ localStorage.removeItem(KEY); location.reload(); } }
+function logEvent(t){ DB.log.unshift({d:today(), t}); if(DB.log.length>40) DB.log.pop(); save(); }
+
+/* ================= prijsmotor (transparant) ================= */
+/* dekkingstekst per voertuig; bij leasing wijkt de dekking af (casco zit in het leasecontract) */
+function dekFor(v){
+  if(v.lease) return 'Bij leasing: eigen letsel + aansprakelijkheid + pech. De schade aan en diefstal van het voertuig zelf (casco) dekt het leasecontract — daarom −40% op deze regel.';
+  return VT[v.type].dek;
+}
+function vehMonthly(v){
+  const t = VT[v.type]; if(!t) return 0;
+  let m = t.base + (v.value||0)*t.vf;
+  if(v.lease) m *= 0.6; /* casco zit in leasecontract */
+  return m;
+}
+function quote(fam){
+  const lines = fam.vehicles.map(v=>({v, m:vehMonthly(v)}));
+  const sub = lines.reduce((s,l)=>s+l.m,0);
+  const bundel = sub * DB.products.bundel/100;
+  const total = sub - bundel;
+  /* losse polissen: zelfde dekking los ingekocht — geen bundelkorting en per polis ± €2,5 administratie */
+  const los = sub + lines.length*2.5;
+  return {lines, sub, bundel, total, los, besparing: los-total};
+}
+const CHANPCT = ch => ({makelaar:DB.products.comm.makelaar, fietsenwinkel:DB.products.comm.winkel, autodealer:DB.products.comm.dealer, online:DB.products.comm.online})[ch] ?? DB.products.comm.online;
+function geldstroomHTML(fam){
+  const p = DB.products; const comm = fam ? CHANPCT(fam.channel) : gewogenComm();
+  const effSchade = p.schadelast * 0.9 / Math.max(0.05, 1 - p.bundel/100);
+  const rest = 100 - effSchade - p.beheer - comm - p.overhead;
+  const segs = [[effSchade,'#870930','schade-uitkeringen'],[p.beheer,'#9aa5a8','beheer'],[comm,'#ff6600','vergoeding kanaal'],[p.overhead,'#c9b037','distributie-overhead']];
+  if(rest >= 0) segs.push([rest,'#2e8b57','buffer & marge P&V']);
+  else segs.push([-rest,'#d13b2f','VERLIES — elke € 100 premie kost er ' + (100-rest).toFixed(0)]);
+  const tot = segs.reduce((s,x)=>s+x[0],0);
+  return `<div style="margin:10px 0 4px"><b class="small" style="color:var(--ink)">Waar gaat elke € 100 premie naartoe?</b>
+  <div style="display:flex;height:20px;border-radius:999px;overflow:hidden;margin:4px 0">${segs.map(s=>`<span style="width:${(s[0]/tot*100)}%;background:${s[1]}" title="${s[2]} ${s[0].toFixed(0)}%"></span>`).join('')}</div>
+  <p class="small" style="margin:0">${segs.map(s=>`<span style="white-space:nowrap">■&#8201;<span style="color:${s[1]};font-weight:700">${rest<0&&s[1]==='#d13b2f'?'−':''}${s[0].toFixed(0)}</span> ${s[2]}</span>`).join(' · ')}</p>
+  ${p.bundel!==10?`<p class="small" style="margin:2px 0 0">De schade in euro's ligt vast; de schuif "${p.schadelast}%" is gedefinieerd bij de referentiekorting van 10%. Bij ${p.bundel}% korting komt diezelfde schade overeen met ${effSchade.toFixed(0)}% van de nettopremie — dat getal ziet u hier.</p>`:''}</div>`;
+}
+function breakdownHTML(fam, opts={}){
+  const q = quote(fam);
+  const commPct = CHANPCT(fam.channel);
+  let rows = q.lines.map(l=>`<tr><td>${VT[l.v.type].icon} ${esc(l.v.label)} <span class="small">(${esc(l.v.who||'')}${l.v.lease?' · leasing':''})</span><br><span class="small">${l.v.lease?'<b>'+dekFor(l.v)+'</b>':dekFor(l.v)}</span></td><td class="r">${eur(l.m)}</td></tr>`).join('');
+  const nu = (fam.huidig&&fam.huidig.length) ? fam.huidig.reduce((s,h)=>s+h.v,0) : null;
+  return `
+  <div class="scrollx"><table class="tbl">
+    <thead><tr><th>Wat zit erin (met de dekking per regel)</th><th class="r">Per maand</th></tr></thead>
+    <tbody>${rows}
+      <tr><td>Bundelvoordeel gezinspolis (−${DB.products.bundel}%)</td><td class="r" style="color:var(--ok)">−${eur(q.bundel)}</td></tr>
+      <tr class="tot"><td>Mobiliteitspolis — alles samen</td><td class="r">${eur(q.total)}</td></tr>
+      ${nu!==null ? `<tr><td>Wat u vandaag betaalt aan losse polissen <span class="small">(uw eigen opgave; let op: de dekking verschilt — zie de dekkingstabel)</span></td><td class="r">${eur(nu)}</td></tr>
+      <tr><td style="color:var(--ok);font-weight:700">${nu-q.total>=0?'Uw besparing':'Meerprijs'} <span class="small" style="font-weight:400">volgens uw opgave — de definitieve prijs krijgt u binnen 5 werkdagen na inzage van uw huidige polissen (demo-regel)</span></td><td class="r" style="color:var(--ok);font-weight:700">${eur(nu-q.total)}/maand</td></tr>`
+      : `<tr><td class="small">Rekenvoorbeeld: dezelfde dekking als losse polissen bij ons (zonder bundelkorting, plus € 2,50 administratie per polis)</td><td class="r small">${eur(q.los)}</td></tr>
+      <tr><td style="color:var(--ok);font-weight:700">Bundelvoordeel voor u</td><td class="r" style="color:var(--ok);font-weight:700">${eur(q.besparing)}/maand</td></tr>`}
+      <tr><td class="small">In uw premie zit ${commPct}% vergoeding voor het verkoopkanaal (wettelijke transparantie) — wij tonen dat liever dan het te verstoppen</td><td class="r small">${eur(q.total*commPct/100)}</td></tr>
+    </tbody>
+  </table></div>
+  ${geldstroomHTML(fam)}
+  ${dekTabel()}
+  <p class="small">${esc(DB.products.prijsnota)} Dekking per persoon: schade aan anderen, eigen letsel en pech — met elk vervoermiddel, ook deelwagen, openbaar vervoer en te voet. Gezinsleden zónder eigen voertuig (bv. kinderen) tellen niet mee in de premie, maar zijn wél volwaardig gedekt via de gezinsdekking.</p>
+  ${opts.compare!==false ? compareHTML(opts.open) : ''}`;
+}
+/* het visuele antwoord op "mijn familiale dekt dat toch al" */
+function dekTabel(){
+  const Y='<span style="color:var(--ok);font-weight:700">✔</span>', N='<span style="color:var(--bad);font-weight:700">✘</span>', P='<span style="color:var(--partial);font-weight:700">±</span>';
+  return `<details style="margin-top:8px"><summary style="cursor:pointer;font-weight:600;color:var(--burgundy)">Dekkingstabel: familiale vs. losse polissen vs. mobiliteitspolis</summary>
+  <div class="scrollx"><table class="tbl" style="margin-top:8px;min-width:440px"><thead><tr><th>Risico</th><th>Alleen familiale</th><th>Losse polissen per voertuig</th><th>Mobiliteitspolis</th></tr></thead><tbody>
+  <tr><td>Schade aan anderen (fiets, te voet)</td><td>${Y}</td><td>${Y}</td><td>${Y}</td></tr>
+  <tr><td>Verplichte BA auto / brommer / speedpedelec</td><td>${N} dekt dit níét</td><td>${Y} per voertuig apart</td><td>${Y} inbegrepen</td></tr>
+  <tr><td>Diefstal &amp; schade aan het voertuig zelf</td><td>${N}</td><td>${P} aparte omnium- of fietspolis per voertuig</td><td>${Y} tot de opgegeven waarde</td></tr>
+  <tr><td>Eigen letsel (elk vervoermiddel)</td><td>${N}</td><td>${P} voor de auto vaak wél (aparte bestuurderspolis); op de fiets, de step of te voet meestal niet</td><td>${Y}</td></tr>
+  <tr><td>Pech onderweg (auto én fiets)</td><td>${N}</td><td>${P} per voertuig apart af te sluiten</td><td>${Y} één nummer</td></tr>
+  <tr><td>Nieuw voertuig in het gezin</td><td>${N}</td><td>${N} nieuwe polis nodig (keuzemoment)</td><td>${Y} gewoon toevoegen</td></tr>
+  <tr><td>Leasefiets zonder dubbele dekking</td><td>${N}</td><td>${P} vaak dubbel of net niet gedekt</td><td>${Y} afgestemd (−40%)</td></tr>
+  </tbody></table></div><p class="small">Op een smal scherm schuift deze tabel horizontaal binnen haar eigen kader.</p></details>`;
+}
+/* kort adviesverslag: leesbaar vóór ondertekening en daarna bij de documenten */
+function adviesverslagHTML(f){
+  const q = quote(f); const nu = (f.huidig&&f.huidig.length)?f.huidig.reduce((s,h)=>s+h.v,0):null;
+  return `<div class="small">
+    <p><b>Waarom deze polis bij ${esc(f.name)} past.</b> ${f.members.length} verzekerde personen (${f.members.map(m=>esc(m.n)).join(', ')}), ${f.vehicles.length} vervoermiddelen, van ${f.vehicles[0]?VT[f.vehicles[0].type].label.toLowerCase():'—'} tot ${f.vehicles.length>1?VT[f.vehicles[f.vehicles.length-1].type].label.toLowerCase():'—'}.</p>
+    <p><b>Vandaag:</b> ${nu!==null?eur(nu)+'/maand aan losse polissen, met de gaten die de dekkingstabel per risico toont (o.a. eigen letsel en pechdekking'+(f.vehicles.some(v=>v.type==='sportfiets')?', en de sportfietsen die vandaag onverzekerd zijn':'')+').':'geen opgave van huidige polissen.'}
+    <b>Met de mobiliteitspolis:</b> ${eurM(q.total)} voor het hele gezin, alle risico's uit de dekkingstabel gedekt, en elk nieuw voertuig schuift erin zonder nieuw contract.</p>
+    <p><b>Overwogen alternatieven:</b> (1) losse omnium-, fiets- en bestuurderspolissen per voertuig bijnemen — duurder op het geheel en lost de keuzemomenten en de gaten bij nieuwe voertuigen niet op; (2) status quo — de gaten uit de dekkingstabel blijven dan bestaan. <b>Meeverzekerde personen zonder eigen voertuig</b> (bv. kinderen) sturen de premie niet; zij zijn gedekt via de gezinsdekking per persoon.</p>
+    <p><b>Overstap:</b> de bestaande polissen worden opgezegd tegen hun vervaldag (overstapservice); betalen per dekking start pas zodra de oude stopt. <b>Vergoeding adviseur:</b> ${CHANPCT(f.channel)}% (IDD-vermelding).</p>
+    <p class="small">Demo-verslag, automatisch opgebouwd uit het dossier.</p></div>`;
+}
+function cmpRows(rows, unit, extra){
+  const max = Math.max(...rows.map(r=>r.v));
+  const min = Math.min(...rows.map(r=>r.v));
+  return rows.map(r=>`
+    <div class="cmp"><span class="nm">${esc(r.n)}${r.v===min?' <span style="color:var(--ok)">✓ goedkoopste</span>':''}</span>
+    <span class="tr"><span class="fl ${r.pv?'pv':''}" style="width:${Math.round(r.v/max*100)}%"></span></span>
+    <span class="vl">${eur(r.v)}${unit}</span></div>`).join('') + (extra?`<p class="small" style="margin:4px 0 0">${extra}</p>`:'');
+}
+/* marktreferentie voor fietsen: lineair per verzekeraar door de publieke punten (€ 1.000 en € 2.000),
+   doorgetrokken tot € 6.000 en dan eerlijk gelabeld als extrapolatie */
+function bikeRefFor(value){
+  if (value > 6000 || value < 400) return null;
+  const rows = REF.fiets1000.map((r,i)=>{
+    const slope = (REF.ebike2000[i].v - r.v)/1000;
+    return {n:r.n, v: Math.max(40, r.v + slope*(value-1000))};
+  });
+  return {rows, extrap: value > 2000};
+}
+function compareHTML(open){
+  return `<details ${open?'open':''} style="margin-top:10px"><summary style="cursor:pointer;font-weight:600;color:var(--burgundy)">Vergelijking met de markt — ook waar wij níét de goedkoopste zijn</summary>
+    <p class="small">Richtprijzen van vergelijkingssites (2026, bronnen in het projectdossier), voor losse producten per voertuig. Let op: de dekking verschilt — de fietsprijzen hieronder dekken diefstal, schade en bijstand, maar meestal géén eigen letsel; de BA-autoprijzen zijn kale BA (VW Golf, ervaren bestuurder, laagste bonus-malus). De mobiliteitspolis dekt dat allemaal wél, voor het hele gezin.</p>
+    <h3 style="margin-top:8px">Fietsverzekering, fiets van € 1.000 (per jaar)</h3>
+    ${cmpRows(REF.fiets1000.map(r=>({...r, pv:r.n.startsWith('P&V')})), '/jaar', 'Ethias is hier de goedkoopste — dat tonen we gewoon. Het verschil zit in de gezinsbundel en de ruimere dekking.')}
+    <h3 style="margin-top:8px">Fietsverzekering, e-bike van € 2.000 (per jaar)</h3>
+    ${cmpRows(REF.ebike2000.map(r=>({...r, pv:r.n.startsWith('P&V')})), '/jaar')}
+    <h3 style="margin-top:8px">Verplichte BA auto, ervaren bestuurder (per jaar)</h3>
+    ${cmpRows(REF.autoBA, '/jaar', 'Voor álleen BA kan u elders goedkoper terecht. Het auto-aandeel in de mobiliteitspolis omvat BA + omnium + bestuurdersdekking + pech; een vergelijkbaar vólledig pakket kost bij concurrenten doorgaans € 700 à € 900/jaar voor dit profiel (indicatie — hiervoor bestaat geen publieke vergelijkingsbron, daarom tonen we er geen staafje bij).')}
+    <p class="small" style="margin-top:8px"><b>Bundelkortingen bij concurrenten</b> (voor wie zelf verder vergelijkt): AXA tot −75% op de motor bij een autopolis, Ethias/Yuzzu/DVV tot −60%, P&amp;V Family Plan vanaf twee contracten. Die kortingen blijven per voertuig gerekend; de mobiliteitspolis bundelt per gezin.</p>
+  </details>`;
+}
+
+/* ================= accounts & login ================= */
+const ACCOUNTS = [
+  {user:'an',    pass:'demo', role:'klant',    icon:'👩', naam:'An Peeters',  sub:'Eindklant — moeder van het gezin Peeters', famId:'fam_peeters'},
+  {user:'marc',  pass:'demo', role:'makelaar', icon:'🤝', naam:'Marc',        sub:'Verzekeringsmakelaar — adviseert en verkoopt'},
+  {user:'els',   pass:'demo', role:'beheerder',icon:'🏢', naam:'Els',         sub:'Productbeheerder mobiliteit bij P&V'},
+  {user:'karim', pass:'demo', role:'fiets',    icon:'🚲', naam:'Karim',       sub:'Fietsverkoper — verkoopt lease & verzekering mee'},
+  {user:'sofie', pass:'demo', role:'auto',     icon:'🚗', naam:'Sofie',       sub:'Autoverkoper — sluit de verzekering direct af'},
+  {user:'dirk',  pass:'demo', role:'directie', icon:'📊', naam:'Dirk',        sub:'Beslissingsnemer — directiecomité P&V'}
+];
+let CUR = null;
+function renderLogin(){
+  document.getElementById('personacards').innerHTML = ACCOUNTS.map((a,i)=>`
+    <button type="button" class="pcard" id="pc${i}" aria-pressed="false" onclick="pickAccount(${i})">
+      <span class="avatar">${a.icon}</span>
+      <span><b>${esc(a.naam)}</b><small>${esc(a.sub)}</small><small>login: <b>${a.user}</b> / wachtwoord: <b>${a.pass}</b></small></span>
+    </button>`).join('');
+}
+function pickAccount(i){
+  ACCOUNTS.forEach((_,j)=>{ const el=document.getElementById('pc'+j); if(el) el.setAttribute('aria-pressed', i===j); });
+  document.getElementById('lg_user').value = ACCOUNTS[i].user;
+  document.getElementById('lg_pass').value = ACCOUNTS[i].pass;
+  document.getElementById('logerr').textContent = '';
+}
+document.addEventListener('submit', e=>{
+  if(e.target.id!=='logform') return;
+  e.preventDefault();
+  const u = document.getElementById('lg_user').value.trim().toLowerCase();
+  const p = document.getElementById('lg_pass').value.trim();
+  const a = ACCOUNTS.find(x=>x.user===u && x.pass===p);
+  if(!a){ document.getElementById('logerr').textContent = 'Onbekende combinatie. Kies een rol hierboven; het wachtwoord is "demo".'; return; }
+  CUR = a; sessionStorage.setItem('mobipolis_user', a.user); enterApp();
+});
+function logout(){ sessionStorage.removeItem('mobipolis_user'); CUR=null;
+  document.getElementById('app').style.display='none'; document.getElementById('login').style.display='flex'; }
+function enterApp(){
+  document.getElementById('login').style.display='none';
+  document.getElementById('app').style.display='block';
+  document.getElementById('whoname').textContent = CUR.naam;
+  document.getElementById('whoavatar').textContent = CUR.icon;
+  document.getElementById('rolename').textContent = ({klant:'Klantportaal', makelaar:'Makelaarsportaal', beheerder:'P&V beheer', fiets:'Fietsenwinkel', auto:'Autodealer', directie:'Directie'})[CUR.role];
+  NAVSEL = NAVS[CUR.role][0].id;
+  renderNav(); render();
+}
+/* ================= navigatie ================= */
+const NAVS = {
+  klant:    [{id:'k_over', l:'Mijn gezin & dekking'},{id:'k_prijs', l:'Prijs & vergelijking'},{id:'k_off', l:'Offerte & ondertekenen'},{id:'k_doc', l:'Mijn documenten'}],
+  makelaar: [{id:'m_kln', l:'Mijn klanten'},{id:'m_adv', l:'Nieuw adviesgesprek'},{id:'m_com', l:'Mijn commissies'}],
+  beheerder:[{id:'b_par', l:'Productparameters'},{id:'b_pf', l:'Portefeuille'},{id:'b_log', l:'Activiteitenlog'}],
+  fiets:    [{id:'f_pos', l:'Verkoop + verzekering (kassa)'},{id:'f_mijn', l:'Mijn verkopen'},{id:'f_waarom', l:'Waarom meeverkopen?'}],
+  auto:     [{id:'a_pos', l:'Aflevering + verzekering'},{id:'a_mijn', l:'Mijn verkopen'},{id:'a_waarom', l:'Waarom meeverkopen?'}],
+  directie: [{id:'d_eco', l:'Het ecosysteem'},{id:'d_hoe', l:'Zo werkt het'},{id:'d_kpi', l:'Cijfers & knoppen'},{id:'d_tra', l:'Transparantie als strategie'}]
+};
+let NAVSEL = null;
+function renderNav(){
+  document.getElementById('navtabs').innerHTML = NAVS[CUR.role].map(n=>
+    `<button role="tab" aria-selected="${n.id===NAVSEL}" onclick="go('${n.id}')">${n.l}</button>`).join('');
+}
+function go(id){ NAVSEL=id; renderNav(); render(); window.scrollTo(0,0); }
+function render(){
+  const f = VIEWS[NAVSEL];
+  document.getElementById('main').innerHTML = f ? f() : '<p>Onbekend scherm.</p>';
+  const after = AFTER[NAVSEL]; if(after) after();
+}
+const AFTER = {};
+
+/* ================= handtekening ================= */
+let sigCb = null, sigDrawn = false;
+const scv = () => document.getElementById('sigcanvas');
+const SIGDOCS_DEFAULT = [
+  'Ik ontving en las het informatiedocument (IPID) en de polisvoorwaarden',
+  'Ik ontving het adviesverslag: waarom deze polis bij dit gezin past'
+];
+function sigOpen(title, sub, cb, docs){
+  sigCb = cb; sigDrawn = false;
+  document.getElementById('sigtitle').textContent = title;
+  document.getElementById('sigsub').textContent = sub || 'Bevestig eerst de documenten, teken daarna.';
+  document.getElementById('sigdocs').innerHTML = (docs===null?[]:(docs||SIGDOCS_DEFAULT)).map((d,i)=>
+    `<label style="display:flex;gap:8px;align-items:flex-start;font-size:.9rem;margin:4px 0;color:var(--ink)"><input type="checkbox" class="sigchk" style="margin-top:4px">${esc(d)}</label>`).join('');
+  document.getElementById('sigerr').textContent='';
+  document.getElementById('sigmodal').style.display='flex';
+  sigClear();
+}
+function sigClear(){ const c=scv(), x=c.getContext('2d'); x.clearRect(0,0,c.width,c.height); sigDrawn=false; document.getElementById('sigerr').textContent=''; }
+function sigClose(ok){ document.getElementById('sigmodal').style.display='none';
+  if(ok && sigCb) sigCb(scv().toDataURL('image/png')); sigCb=null; }
+function sigConfirm(){
+  const chks = [...document.querySelectorAll('.sigchk')];
+  if(chks.some(c=>!c.checked)){ document.getElementById('sigerr').textContent='Vink eerst de documenten hierboven af — die horen bij een geldige afsluiting.'; return; }
+  if(!sigDrawn){ document.getElementById('sigerr').textContent='Teken eerst een handtekening in het kader.'; return; }
+  sigClose(true);
+}
+(function(){
+  let draw=false, px=0, py=0;
+  function pos(e){ const r=scv().getBoundingClientRect(); const t=e.touches?e.touches[0]:e;
+    return [(t.clientX-r.left)*scv().width/r.width,(t.clientY-r.top)*scv().height/r.height]; }
+  function start(e){ draw=true; [px,py]=pos(e); e.preventDefault(); }
+  function move(e){ if(!draw) return; const [x,y]=pos(e); const c=scv().getContext('2d');
+    c.strokeStyle='#2b2b2b'; c.lineWidth=2.4; c.lineCap='round';
+    c.beginPath(); c.moveTo(px,py); c.lineTo(x,y); c.stroke(); px=x; py=y; sigDrawn=true; e.preventDefault(); }
+  function end(){ draw=false; }
+  document.addEventListener('DOMContentLoaded', ()=>{ const c=scv();
+    c.addEventListener('mousedown',start); c.addEventListener('mousemove',move); window.addEventListener('mouseup',end);
+    c.addEventListener('touchstart',start,{passive:false}); c.addEventListener('touchmove',move,{passive:false}); c.addEventListener('touchend',end);
+  });
+})();
+
+/* ================= gedeelde bouwstenen ================= */
+const fam = id => DB.families.find(f=>f.id===id);
+const badge = s => ({actief:'<span class="badge b-actief">Actief</span>', offerte:'<span class="badge b-offerte">Offerte — wacht op handtekening</span>', prospect:'<span class="badge b-prospect">Prospect</span>'})[s] || s;
+function activate(f, sig, kanaal){
+  f.signature = sig; f.signedAt = today(); f.status = 'actief';
+  f.polisNr = 'MOB-2026-' + String(1000 + Math.floor(Math.random()*9000));
+  f.history.unshift({d:today(), t:'Overstapservice gestart: P&V zegt de bestaande losse polissen op tegen hun vervaldag; tot dan betaalt het gezin niets dubbel.'});
+  f.history.unshift({d:today(), t:'Polis ondertekend door de klant (kanaal: '+kanaal+') en meteen actief. Documenten aangemaakt: polisblad, verzekeringsbewijzen, adviesverslag en overstapoverzicht (zichtbaar voor klant én kanaal).'});
+  logEvent('Polis '+f.polisNr+' voor '+f.name+' geactiveerd via '+kanaal+'. Premie '+eurM(quote(f).total)+'.');
+  save();
+}
+function docsHTML(f){
+  if(f.status!=='actief') return '<div class="note">Nog geen documenten: de polis is pas actief na ondertekening.</div>';
+  const q = quote(f);
+  const groene = f.vehicles.filter(v=>VT[v.type].groen).map(v=>`
+    <div class="greencard">
+      <h3>${v.type==='auto'?'Internationaal verzekeringsbewijs (groene kaart)':'Verzekeringsattest '+VT[v.type].label.toLowerCase()+(v.lease?' — BA via de mobiliteitspolis, casco via het leasecontract':'')} — voorlopig</h3>
+      <table><tr><td>Voertuig</td><td><b>${esc(v.label)}</b>${v.label!==VT[v.type].label?' ('+VT[v.type].label+')':''}</td></tr>
+      <tr><td>Kenteken</td><td><b>${esc(v.plate||'wordt aangevuld bij inschrijving')}</b></td></tr>
+      <tr><td>Polisnummer</td><td>${f.polisNr}</td></tr>
+      <tr><td>Verzekeringnemer</td><td>${esc(f.name)}</td></tr>
+      <tr><td>Geldig</td><td>van ${f.signedAt} tot ${plusDays(39)} (daarna definitieve kaart)</td></tr></table>
+      <p class="small">Loopt er voor dit voertuig nog een BA bij een andere verzekeraar, dan blijft díé kaart gelden tot de vervaldag (zie overstapoverzicht); dit voorlopige bewijs is het vangnet; <b>P&amp;V verlengt het zelf, automatisch en kosteloos</b>, zo vaak als nodig tot de oude polis afloopt, en stuurt daarna de definitieve kaart. <b>U hoeft niets te doen</b> — ze valt vanzelf in de bus en in uw mailbox. Demodocument — geen echt verzekeringsbewijs.</p>
+    </div>`).join('');
+  return `
+  <div class="doc">
+    <div class="dochead"><b>Polisblad — Mobiliteitspolis</b><span>Polisnummer <b>${f.polisNr}</b> · ${f.signedAt}</span></div>
+    <p><b>${esc(f.name)}</b> — verzekerde personen: ${f.members.map(m=>esc(m.n)).join(', ')}.</p>
+    <p>Dekking per persoon, met elk vervoermiddel: <b>schade aan anderen</b> (incl. verplichte BA waar nodig), <b>eigen letsel</b> en <b>pechbijstand</b>. Nieuwe voertuigen worden toegevoegd zonder nieuwe polis.</p>
+    ${breakdownHTML(f,{compare:false})}
+    <p>Ondertekend op ${f.signedAt}:</p>
+    ${f.signature && f.signature.startsWith('data:') ? `<img class="sigimg" src="${f.signature}" alt="handtekening">` : `<p><i>${esc(f.signature||'')}</i></p>`}
+    <button class="btn sec noprint" onclick="window.print()">Afdrukken / bewaar als PDF</button>
+  </div>
+  <div class="doc">
+    <div class="dochead"><b>Adviesverslag</b><span>${f.signedAt}</span></div>
+    ${adviesverslagHTML(f)}
+  </div>
+  ${f.huidig&&f.huidig.length?`<div class="doc">
+    <div class="dochead"><b>Overstapoverzicht</b><span>${f.signedAt}</span></div>
+    <p class="small">Deze polissen zegt de overstapservice voor u op tegen hun vervaldag; tot dan betaalt u ze gewoon verder en betaalt u bij ons niets voor die <i>vervangen</i> dekkingen. Alleen de níéuwe dekkingen (zie onderaan) start u vanaf vandaag:</p>
+    <div class="scrollx"><table class="tbl"><thead><tr><th>Huidige polis</th><th class="r">Premie</th><th>Vervaldag (opzeg door P&amp;V)</th><th>Premie bij P&amp;V start</th></tr></thead><tbody>${f.huidig.map(h=>`<tr><td>${esc(h.n)}</td><td class="r">${h.v?eurM(h.v):'—'}</td><td>${h.verval?esc(h.verval):'nog op te vragen bij uw huidige verzekeraar'}</td><td>${h.verval&&/\d/.test(h.verval)?'de dag nadien':'zodra de oude polis stopt'}</td></tr>`).join('')}</tbody></table></div>
+    ${(()=>{ const q2=quote(f); const nu2=f.huidig.reduce((s,h)=>s+h.v,0);
+      const zacht=['sportfiets','fiets','ebike','step','deelauto','ov'];
+      const nieuwDeel = q2.lines.filter(l=>zacht.includes(l.v.type)).reduce((s,l)=>s+l.m,0) * (1-DB.products.bundel/100);
+      const events0 = f.huidig.filter(h=>parseVerval(h.verval)).sort((a,b)=>parseVerval(a.verval)-parseVerval(b.verval));
+      /* polissen met dezelfde vervaldag samenvoegen tot één tijdlijnregel */
+      const events = []; events0.forEach(h=>{ const key=fmtVerval(h.verval); const e=events.find(x=>x.key===key);
+        if(e){ e.v+=h.v; e.n+=' en '+h.n; } else events.push({key, v:h.v, n:h.n}); });
+      const laatste = events.length ? events[events.length-1].key : 'de laatste vervaldag';
+      const overgenomen = Math.max(0, q2.total - nieuwDeel);
+      let cur = nu2 + nieuwDeel, tl = `<li><b>vandaag</b> — ± ${eurM(cur)} (huidige polissen + nieuwe dekkingen)</li>`;
+      events.forEach(h=>{ cur = cur - h.v + (nu2 ? overgenomen*(h.v/nu2) : 0);
+        tl += `<li><b>na ${esc(h.key)}</b> (${esc(h.n)}) — ± ${eurM(cur)}</li>`; });
+      return `${nieuwDeel>0.5?`<p class="small"><b>Nieuwe dekkingen zonder oude polis</b> (zoals de sportfietsen, de gewone fietsen, Poppy, de trein en het eigen letsel van het gezin): die premie start meteen op ${f.signedAt} en bedraagt <b>± ${eurM(nieuwDeel)}</b> (benadering) — dat is het enige deel dat u vanaf vandaag al betaalt.</p>`:`<p class="small"><b>Geen extra overgangsbedrag:</b> al uw nieuwe dekkingen vervangen een bestaande polis, dus u betaalt vanaf vandaag niets extra.</p>`}
+      <p class="small"><b>Wat betaalt u wanneer, in euro's?</b> ${nu2?`De eerste maanden: uw huidige ${eur(nu2)}${nieuwDeel>0.5?` + ± ${eur(nieuwDeel)} nieuwe dekkingen = <b>± ${eur(nu2+nieuwDeel)}/maand</b> — tijdelijk dus iets méér dan vandaag, in ruil voor de extra dekking die meteen ingaat`:` — niet méér dan vandaag`}. Bij elke vervaldag stopt een oude polis en schuift die dekking over. Na ${esc(laatste)} betaalt u alleen nog de mobiliteitspolis: <b>${eurM(q2.total)}</b>, met ruimere dekking.`:`vanaf vandaag ${eurM(q2.total)} voor de volledige polis.`}</p>
+      ${nu2&&events.length?`<ul class="small" style="margin:4px 0 8px 18px">${tl}</ul>`:''}
+      <p class="small">Liever niet tijdelijk meer betalen? De start van de nieuwe dekkingen kan ook worden uitgesteld tot de eerste vervaldag — bespreek het met uw adviseur. (Bedragen per periode zijn benaderingen.)</p>`; })()}
+    <p class="small"><b>Wat vervangt deze polis?</b> Alleen de mobiliteitsluiken: BA, omnium, bestuurders-, fiets- en pechdekking, en het verkeersluik van de familiale. Brand-, woning- of andere niet-mobiliteitspolissen behoudt u gewoon.</p>
+  </div>`:''}
+  ${groene}`;
+}
+function famTable(f){
+  return `<div class="scrollx"><table class="tbl" style="min-width:460px"><thead><tr><th>Voertuig / mobiliteit</th><th>Gebruiker</th><th class="r">Waarde</th><th class="r">Premie</th></tr></thead><tbody>
+  ${f.vehicles.map(v=>`<tr><td>${VT[v.type].icon} ${esc(v.label)}${v.lease?' <span class="badge b-prospect">leasing</span>':''}</td><td>${esc(v.who||'')}</td><td class="r">${v.value?eur0(v.value):'—'}</td><td class="r">${eur(vehMonthly(v))}</td></tr>`).join('')}
+  </tbody></table></div>`;
+}
+
+/* ================= VIEWS ================= */
+const VIEWS = {};
+
+/* ---------- KLANT ---------- */
+VIEWS.k_over = () => { const f = fam(CUR.famId); const q = quote(f);
+  return `<h1>Dag ${esc(CUR.naam.split(' ')[0])}</h1>
+  <p class="hint">Dit is uw gezin zoals de mobiliteitspolis het ziet: personen eerst, voertuigen daarna. ${badge(f.status)}</p>
+  <div class="grid2">
+    <div class="card"><h2>Uw gezin</h2>
+      <ul>${f.members.map(m=>`<li><b>${esc(m.n)}</b> — ${m.r}</li>`).join('')}</ul>
+      <h2 style="margin-top:14px">Alles waarmee jullie onderweg zijn</h2>
+      ${famTable(f)}
+      <p class="small">Ook de leasefiets, de deelwagen en de trein tellen mee: de polis verzekert <b>personen</b>, dus u bent ook daar gedekt voor eigen letsel en aansprakelijkheid. Voor de leasefiets betaalt u minder, want de schadeverzekering zit al in het leasecontract.</p>
+      <button class="btn sec" onclick="go('k_voeg')">+ Voertuig toevoegen</button>
+    </div>
+    <div>
+      <div class="card"><h2>Status</h2>
+        ${f.status==='offerte' ? `<div class="note"><b>Er ligt een offerte klaar</b> van uw makelaar Marc: ${eurM(q.total)} voor het hele gezin. Bekijk ze en onderteken digitaal wanneer u klaar bent.</div>
+        <button class="btn orange" onclick="go('k_off')">Bekijk offerte & onderteken</button>`
+        : f.status==='actief' ? `<div class="calm">Uw mobiliteitspolis <b>${f.polisNr}</b> is actief sinds ${f.signedAt}. Alle documenten staan klaar.</div><button class="btn" onclick="go('k_doc')">Naar mijn documenten</button>`
+        : '<p>Nog geen offerte.</p>'}
+      </div>
+      <div class="card"><h2>Historiek</h2><ul class="timeline">${f.history.map(h=>`<li><b>${h.d}</b> — ${esc(h.t)}</li>`).join('')}</ul></div>
+    </div>
+  </div>`;
+};
+VIEWS.k_voeg = () => `<h1>Voertuig toevoegen</h1>
+  <p class="hint">Nieuw voertuig in het gezin? Toevoegen volstaat — geen nieuwe polis, geen nieuw contract.</p>
+  <div class="card" style="max-width:520px">
+    <div class="fld"><label for="nv_type">Type</label><select id="nv_type">${Object.entries(VT).map(([k,t])=>`<option value="${k}">${t.label}</option>`).join('')}</select></div>
+    <div class="fld"><label for="nv_label">Omschrijving</label><input id="nv_label" placeholder="bv. nieuwe e-bike"></div>
+    <div class="fld"><label for="nv_value">Waarde (€)</label><input id="nv_value" type="number" value="2000" min="0"></div>
+    <div class="fld"><label for="nv_who">Wie gebruikt het?</label><input id="nv_who" placeholder="bv. Tom"></div>
+    <div class="fld"><label><input type="checkbox" id="nv_lease" style="width:auto;margin-right:6px">In leasing (casco al gedekt via leasecontract)</label></div>
+    <p class="small" id="nv_prijs"></p>
+    <button class="btn" onclick="klantVoegToe()">Toevoegen aan de gezinspolis</button>
+    <button class="btn ghost" onclick="go('k_over')">Annuleren</button>
+  </div>`;
+AFTER.k_voeg = () => {
+  const upd = ()=>{ const v={type:document.getElementById('nv_type').value, value:+document.getElementById('nv_value').value||0, lease:document.getElementById('nv_lease').checked};
+    document.getElementById('nv_prijs').innerHTML = 'Premie-impact: <b>+'+eur(vehMonthly(v))+'/maand</b>, vóór bundelkorting. U ziet het meteen — geen verrassingen achteraf.'; };
+  ['nv_type','nv_value','nv_lease'].forEach(id=>document.getElementById(id).addEventListener('input',upd)); upd();
+};
+function klantVoegToe(){
+  const f = fam(CUR.famId);
+  f.vehicles.push({id:nid('v'), type:document.getElementById('nv_type').value,
+    label:document.getElementById('nv_label').value||VT[document.getElementById('nv_type').value].label,
+    value:+document.getElementById('nv_value').value||0, lease:document.getElementById('nv_lease').checked,
+    who:document.getElementById('nv_who').value||''});
+  f.history.unshift({d:today(), t:'Voertuig toegevoegd door de klant zelf: '+(document.getElementById('nv_label').value||'nieuw voertuig')+'. Premie automatisch aangepast.'});
+  logEvent(f.name+' voegde zelf een voertuig toe; premie herberekend naar '+eurM(quote(f).total)+'.');
+  save(); go('k_over');
+}
+VIEWS.k_prijs = () => { const f = fam(CUR.famId); const q=quote(f);
+  const nu = f.huidig.reduce((s,h)=>s+h.v,0);
+  return `<h1>Prijs & vergelijking — niets verborgen</h1>
+  <p class="hint">Eén helder verhaal: wat u vandaag betaalt, wat de mobiliteitspolis kost, en wat de markt vraagt — ook waar wij niet de goedkoopste zijn.</p>
+  <div class="grid2">
+    <div class="card"><h2>Opbouw van uw premie</h2>${breakdownHTML(f,{open:true})}</div>
+    <div class="card"><h2>Uw huidige losse polissen (uw eigen opgave)</h2>
+      ${f.huidig.length ? `<table class="tbl"><tbody>${f.huidig.map(h=>`<tr><td>${esc(h.n)}</td><td class="r">${eurM(h.v)}</td></tr>`).join('')}
+      <tr class="tot"><td>Huidige losse polissen samen</td><td class="r">${eurM(nu)}</td></tr></tbody></table>
+      <div class="calm"><b>De kern in één zin:</b> vandaag ${eurM(nu)} mét gaten (geen eigen-letseldekking, sportfietsen onverzekerd, brommer apart) → mobiliteitspolis <b>${eurM(q.total)}</b> voor <b>alle</b> gezinsleden en <b>alle</b> vervoermiddelen, ook Poppy en de trein. Besparing: <b>${eur(nu-q.total)}/maand</b>, met ruimere dekking.</div>`
+      : '<p>Geen huidige polissen geregistreerd. Geef ze door aan uw adviseur, dan maken we de vergelijking met uw echte cijfers.</p>'}
+    </div>
+  </div>`;
+};
+VIEWS.k_off = () => { const f = fam(CUR.famId); const q=quote(f);
+  if(f.status==='actief') return `<h1>Offerte</h1><div class="calm">U heeft al getekend — polis ${f.polisNr} is actief.</div><button class="btn" onclick="go('k_doc')">Naar mijn documenten</button>`;
+  return `<h1>Offerte van uw makelaar</h1>
+  <p class="hint">Opgesteld door ${esc(f.beheerder)} · ${badge(f.status)} · De volledige prijsopbouw en marktvergelijking staan onder "Prijs &amp; vergelijking"; hier vindt u de kern en tekent u.</p>
+  <div class="card" style="max-width:760px">
+    <h2>Mobiliteitspolis voor ${esc(f.name)} — ${eurM(q.total)}</h2>
+    ${breakdownHTML(f)}
+    <details style="margin:10px 0"><summary style="cursor:pointer;font-weight:600;color:var(--burgundy)">Adviesverslag — waarom deze polis bij uw gezin past</summary>${adviesverslagHTML(f)}</details>
+    <details style="margin:10px 0"><summary style="cursor:pointer;font-weight:600;color:var(--burgundy)">Polisvoorwaarden &amp; IPID — lees vóór u tekent</summary>
+      <ul class="small" style="margin:8px 0">
+        <li><b>Verzekerde personen:</b> ${f.members.map(m=>esc(m.n)).join(', ')} — gedekt met elk vervoermiddel, ook te voet, met de deelwagen of het openbaar vervoer.</li>
+        <li><b>Dekking per persoon:</b> schade aan anderen (incl. verplichte BA waar nodig), eigen letsel tot € 500.000 per persoon, pechbijstand. Franchise € 150 per schadegeval (demo-aannames).</li>
+        <li><b>Leasevoertuigen:</b> wij vragen uw leasecontract op en stemmen de dekking af, zodat u nooit dubbel betaalt of dubbel gedekt bent.</li>
+        <li><b>Looptijd:</b> 1 jaar, stilzwijgend verlengd; jaarlijks opzegbaar. Nieuwe voertuigen toevoegen kan altijd, zonder nieuw contract.</li>
+        <li class="small">Demo-samenvatting; de echte flow levert het volledige IPID en de algemene voorwaarden als pdf.</li>
+      </ul>
+    </details>
+    <div class="calm"><b>Hoe de overstap loopt:</b> na ondertekening is de polis meteen actief als vangnet (ingangsdatum ${today()}). Voor dekkingen die een oude polis <b>vervangen</b>, betaalt u bij ons pas zodra die oude polis stopt (de overstapservice zegt ze op tegen de vervaldag) — nooit dubbel voor dezelfde dekking, en de verplichte BA valt geen dag zonder dekking. <b>Nieuwe dekkingen zonder oude polis</b> (sportfietsen, gewone fietsen, Poppy, trein, eigen letsel) start u wél meteen: voor uw gezin ± ${(()=>{const q3=quote(f); const zacht=['sportfiets','fiets','ebike','step','deelauto','ov']; return eurM(q3.lines.filter(l=>zacht.includes(l.v.type)).reduce((s,l)=>s+l.m,0)*(1-DB.products.bundel/100));})()} extra tijdens de overgangsmaanden. Liever geen extra bedrag nu? Vraag uw makelaar vóór het tekenen om die start uit te stellen tot de eerste vervaldag. Het volledige kostenverloop staat na ondertekening in uw overstapoverzicht.</div>
+    <button class="btn orange" onclick="klantTeken()">Digitaal ondertekenen</button>
+    <button class="btn ghost" onclick="go('k_prijs')">Eerst de vergelijking bekijken</button>
+    <p class="small" style="margin-top:10px">Liever eerst overleggen? Bel of mail uw makelaar Marc: 0470 12 34 56 · marc@kantoor-demo.be (demo).</p>
+  </div>`;
+};
+function klantTeken(){
+  const f = fam(CUR.famId);
+  sigOpen('Onderteken uw mobiliteitspolis', 'Door te tekenen aanvaardt u de offerte van '+eurM(quote(f).total)+' (demo).', sig=>{
+    activate(f, sig, 'klantportaal'); go('k_doc');
+  });
+}
+VIEWS.k_doc = () => { const f = fam(CUR.famId);
+  return `<h1>Mijn documenten</h1><p class="hint">Alles wat u nodig heeft, direct na ondertekening — uitgerold zonder wachttijd.</p>${docsHTML(f)}`;
+};
+
+/* ---------- MAKELAAR ---------- */
+let FLASH = '';
+VIEWS.m_kln = () => `<h1>Mijn klanten</h1>
+  ${FLASH?`<div class="calm">${esc(FLASH)}</div>`:''}${FLASH=''}
+  <p class="hint">Eén gezinspolis per klant in plaats van zes losse contracten: minder administratie, meer gesprek.</p>
+  <table class="tbl"><thead><tr><th>Gezin</th><th>Leden</th><th>Voertuigen</th><th class="r">Premie/maand</th><th>Status</th><th></th></tr></thead><tbody>
+  ${DB.families.map(f=>`<tr><td><b>${esc(f.name)}</b></td><td>${f.members.length}</td><td>${f.vehicles.length}</td><td class="r">${eur(quote(f).total)}</td><td>${badge(f.status)}</td>
+  <td><button class="btn sec" onclick="mkOpen('${f.id}')">Open dossier</button></td></tr>`).join('')}
+  </tbody></table>
+  <button class="btn" style="margin-top:12px" onclick="go('m_adv')">+ Nieuw adviesgesprek</button>
+  <div id="mkdossier"></div>`;
+function mkOpen(id){ const f=fam(id);
+  document.getElementById('mkdossier').innerHTML = `
+  <div class="card" style="margin-top:16px"><h2>Dossier ${esc(f.name)}</h2>
+  ${famTable(f)}
+  ${breakdownHTML(f)}
+  ${f.status==='offerte' ? `<div class="note">Offerte verstuurd — wacht op handtekening van de klant. U kan ook <b>in kantoor laten tekenen</b>:</div>
+    <button class="btn orange" onclick="mkTeken('${f.id}')">Laat klant hier ondertekenen</button>` : ''}
+  ${f.status==='actief' ? `<div class="calm">Polis ${f.polisNr} actief sinds ${f.signedAt}. Uw commissie loopt (zie tabblad commissies).</div>
+  <details style="margin:10px 0"><summary style="cursor:pointer;font-weight:600;color:var(--burgundy)">Documenten van dit dossier (polisblad, adviesverslag, overstapoverzicht, verzekeringsbewijzen) — afdrukbaar</summary>${docsHTML(f)}</details>` : ''}
+  <h3 style="margin-top:12px">Historiek</h3><ul class="timeline">${f.history.map(h=>`<li><b>${h.d}</b> — ${esc(h.t)}</li>`).join('')}</ul>
+  </div>`;
+}
+function mkTeken(id){ const f=fam(id);
+  sigOpen('Klant ondertekent in uw kantoor', 'Geef het toestel aan de klant voor de handtekening.', sig=>{
+    activate(f, sig, 'makelaar'); go('m_kln'); mkOpen(id);
+  });
+}
+let ADV = null;
+VIEWS.m_adv = () => { if(!ADV) ADV = {step:1, name:'', members:[{n:'',r:'volwassene'}], vehicles:[]};
+  const steps = ['Gezin','Voertuigen','Offerte & transparantie','Handtekening'];
+  const stepHTML = steps.map((s,i)=>`<span class="step ${ADV.step===i+1?'cur':ADV.step>i+1?'done':''}"><i>${ADV.step>i+1?'✓':i+1}</i>${s}</span>`).join('');
+  let body='';
+  if(ADV.step===1){ body = `<div class="card" style="max-width:560px"><h2>Stap 1 — Wie is het gezin?</h2>
+    <div class="fld"><label>Gezinsnaam</label><input id="ad_name" value="${esc(ADV.name)}" placeholder="bv. Gezin Willems"></div>
+    ${ADV.members.map((m,i)=>`<div class="fld" style="display:flex;gap:8px;align-items:center">
+      <input style="flex:1" id="ad_m${i}" value="${esc(m.n)}" placeholder="naam" aria-label="Naam persoon ${i+1}">
+      <select id="ad_r${i}" aria-label="Rol persoon ${i+1}"><option ${m.r==='volwassene'?'selected':''} value="volwassene">volwassene</option><option ${m.r==='kind'?'selected':''} value="kind">kind</option></select>
+      <button class="btn ghost" onclick="advDelM(${i})" aria-label="Verwijder persoon ${i+1}">×</button></div>`).join('')}
+    <button class="btn sec" onclick="advAddM()">+ Persoon</button>
+    <div style="margin-top:14px"><button class="btn" onclick="advNext1()">Volgende: voertuigen</button></div></div>`; }
+  if(ADV.step===2){ body = `<div class="card" style="max-width:640px"><h2>Stap 2 — Waarmee is het gezin onderweg, en wat hebben ze vandaag?</h2>
+    <p class="hint">Alles telt mee: ook brommer, leasefiets, deelwagen of treinabonnement.</p>
+    ${ADV.vehicles.map((v,i)=>`<div class="fld" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <select id="av_t${i}" aria-label="Type voertuig ${i+1}">${Object.entries(VT).map(([k,t])=>`<option value="${k}" ${v.type===k?'selected':''}>${t.label}</option>`).join('')}</select>
+      <input id="av_v${i}" type="number" style="width:110px" value="${v.value}" title="waarde €" aria-label="Waarde voertuig ${i+1} in euro">
+      <input id="av_w${i}" style="width:120px" value="${esc(v.who)}" placeholder="gebruiker" aria-label="Gebruiker voertuig ${i+1}">
+      <label class="small"><input type="checkbox" id="av_l${i}" ${v.lease?'checked':''} aria-label="Voertuig ${i+1} in leasing"> lease</label>
+      <button class="btn ghost" onclick="advDelV(${i})" aria-label="Verwijder voertuig ${i+1}">×</button></div>`).join('')}
+    <button class="btn sec" onclick="advAddV()">+ Voertuig</button>
+    <h3 style="margin-top:16px">Huidige polissen van het gezin <span class="small">(optioneel, maar dit maakt de vergelijking en het overstapoverzicht concreet)</span></h3>
+    ${(ADV.huidigL||[]).map((h,i)=>`<div class="fld" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <input id="hp_n${i}" style="flex:1;min-width:150px" value="${esc(h.n)}" placeholder="bv. BA + omnium auto (verzekeraar X)" aria-label="Naam huidige polis ${i+1}">
+      <input id="hp_v${i}" type="number" style="width:100px" value="${h.v||''}" placeholder="€/maand" aria-label="Maandpremie huidige polis ${i+1}">
+      <input id="hp_d${i}" style="width:130px" value="${esc(h.verval||'')}" placeholder="bv. 01/03/2027" aria-label="Vervaldag huidige polis ${i+1}">
+      <button class="btn ghost" onclick="advDelH(${i})" aria-label="Verwijder huidige polis ${i+1}">×</button></div>`).join('')}
+    <button class="btn sec" onclick="advAddH()">+ Huidige polis</button>
+    <div style="margin-top:14px"><button class="btn" onclick="advNext2()">Bereken transparante offerte</button>
+    <button class="btn ghost" onclick="ADV.step=1;render()">Terug</button></div></div>`; }
+  if(ADV.step===3){ const f = advFam(); const q=quote(f);
+    body = `<div class="grid2"><div class="card"><h2>Stap 3 — Offerte (klantweergave)</h2>
+    <p class="hint">Dit scherm toont u aan de klant: premie-opbouw, dekkingstabel, kanaalvergoeding en marktvergelijking, open en bloot.</p>
+    ${breakdownHTML(f,{open:true})}
+    <details style="margin:10px 0"><summary style="cursor:pointer;font-weight:600;color:var(--burgundy)">Polisvoorwaarden &amp; IPID — samenvatting voor de klant</summary>
+      <ul class="small" style="margin:8px 0">
+        <li><b>Verzekerde personen:</b> ${f.members.map(m=>esc(m.n)).join(', ')} — gedekt met elk vervoermiddel, ook te voet, deelwagen en openbaar vervoer.</li>
+        <li><b>Dekking per persoon:</b> schade aan anderen (incl. verplichte BA waar nodig), eigen letsel tot € 500.000 per persoon, pechbijstand. Franchise € 150 (demo-aannames).</li>
+        <li><b>Looptijd:</b> 1 jaar, stilzwijgend verlengd; jaarlijks opzegbaar. Nieuwe voertuigen toevoegen kan altijd, zonder nieuw contract.</li>
+        <li class="small">Demo-samenvatting; de echte flow levert het volledige IPID en de algemene voorwaarden als pdf.</li></ul>
+    </details>
+    <details style="margin:10px 0"><summary style="cursor:pointer;font-weight:600;color:var(--burgundy)">Adviesverslag (automatisch opgebouwd — uw bescherming én de hunne)</summary>
+      ${adviesverslagHTML(f)}
+      <p class="small" style="margin:4px 0 8px">Dit verslag wordt bij ondertekening aan het dossier toegevoegd en is daarna afdrukbaar voor klant én makelaar.</p>
+    </details>
+    <div class="calm"><b>Hoe de overstap loopt:</b> na ondertekening is de polis meteen actief als vangnet (ingangsdatum ${today()}). Dekkingen die een oude polis <b>vervangen</b>, betaalt het gezin bij ons pas zodra die oude polis stopt (opzeg tegen de vervaldag) — nooit dubbel voor dezelfde dekking, en de verplichte BA valt geen dag zonder dekking. ${(()=>{const zacht=['sportfiets','fiets','ebike','step','deelauto','ov']; const nd=q.lines.filter(l=>zacht.includes(l.v.type)).reduce((s,l)=>s+l.m,0)*(1-DB.products.bundel/100); return nd>0.5?`<b>Nieuwe dekkingen zonder oude polis</b> start het gezin wél meteen: ± ${eurM(nd)} extra tijdens de overgangsmaanden — of uitgesteld tot de eerste vervaldag, als de klant dat kiest.`:`Alle dekkingen vervangen hier een bestaande polis, dus er is <b>geen extra overgangsbedrag</b>.`})()}</div></div>
+    <div><details class="card" style="border-style:dashed;border-color:var(--burgundy)"><summary style="cursor:pointer;font-weight:700;color:var(--burgundy)">Alleen voor u als makelaar — klik om te openen, klapt dicht voor de klant</summary>
+      <p class="hint">Uw gespreksnotities — presenteer het linkerscherm, houd dit dicht.</p>
+      <ul><li>Eén contract, <b>geen gaten</b> tussen polissen; elk nieuw voertuig = toevoegen, niet heronderhandelen — de klant blijft bij u.</li>
+      <li><b>Bezwaar "opzeggen kost geld":</b> de overstapservice zegt oude polissen op tegen de vervaldag; de klant betaalt nooit dubbel.</li>
+      <li><b>Bezwaar "betaal ik dan maanden niets?":</b> klopt — de vangnetperiode is acquisitiekost van P&amp;V. Uw commissie loopt mee met de premie, dus per dekking pas vanaf de vervaldag.</li>
+      <li><b>Bezwaar "mijn familiale dekt dat al":</b> de familiale dekt alleen schade aan anderen, geen eigen letsel of pech — toon het verschil in de dekkingstabel.</li>
+      <li><b>Bezwaar "mijn leasefiets is al verzekerd":</b> klopt voor de casco; daarom rekent de polis −40% op leasevoertuigen.</li>
+      <li><b>Uw vergoeding:</b> ${DB.products.comm.makelaar}% op ${eurM(q.total)} = <b>${eur(q.total*DB.products.comm.makelaar/100)}/maand</b> op kruissnelheid, elk jaar opnieuw zolang de klant blijft. De klant ziet dit percentage ook — dat is bewust (IDD-transparantie).</li></ul></details>
+      <div class="card">
+      <button class="btn orange" onclick="advSend()">Offerte mailen — klant tekent later thuis</button>
+      <button class="btn" onclick="advSignNow()">Klant tekent nu in kantoor</button>
+      <button class="btn ghost" onclick="ADV.step=2;render()">Terug</button>
+    </div></div></div>`; }
+  return `<h1>Nieuw adviesgesprek</h1><div class="steps">${stepHTML}</div>${body}`;
+};
+function advGrab(){ if(ADV.step===1){ ADV.name=document.getElementById('ad_name').value;
+    ADV.members = ADV.members.map((m,i)=>({n:document.getElementById('ad_m'+i).value, r:document.getElementById('ad_r'+i).value})); }
+  if(ADV.step===2){ ADV.vehicles = ADV.vehicles.map((v,i)=>({...v, type:document.getElementById('av_t'+i).value,
+    value:+document.getElementById('av_v'+i).value||0, who:document.getElementById('av_w'+i).value, lease:document.getElementById('av_l'+i).checked}));
+    ADV.huidigL = (ADV.huidigL||[]).map((h,i)=>({n:document.getElementById('hp_n'+i).value, v:+document.getElementById('hp_v'+i).value||0, verval:document.getElementById('hp_d'+i).value}));
+    ADV.nu = ADV.huidigL.reduce((s,h)=>s+h.v,0); } }
+function advAddH(){ advGrab(); (ADV.huidigL=ADV.huidigL||[]).push({n:'',v:0,verval:''}); render(); }
+function advDelH(i){ advGrab(); ADV.huidigL.splice(i,1); render(); }
+function advAddM(){ advGrab(); ADV.members.push({n:'',r:'volwassene'}); render(); }
+function advDelM(i){ advGrab(); ADV.members.splice(i,1); render(); }
+function advAddV(){ advGrab(); ADV.vehicles.push({type:'fiets', value:800, who:'', lease:false, label:''}); render(); }
+function advDelV(i){ advGrab(); ADV.vehicles.splice(i,1); render(); }
+function advNext1(){ advGrab(); if(!ADV.name.trim()){ alert('Geef het gezin een naam.'); return; }
+  ADV.members = ADV.members.filter(m=>m.n.trim()); if(!ADV.members.length){ alert('Voeg minstens één persoon toe.'); return; }
+  if(!ADV.vehicles.length) ADV.vehicles.push({type:'auto', value:25000, who:'', lease:false, label:''});
+  ADV.step=2; render(); }
+function advNext2(){ advGrab(); if(!ADV.vehicles.length){ alert('Voeg minstens één voertuig toe.'); return; } ADV.step=3; render(); }
+function advFam(){ return { id:'tmp', name:ADV.name, members:ADV.members, status:'prospect', channel:'makelaar', beheerder:'Marc (makelaar)',
+  vehicles: ADV.vehicles.map((v,i)=>({id:'nv'+i, type:v.type, label:v.label||VT[v.type].label, value:v.value, lease:v.lease, who:v.who})),
+  huidig: (ADV.huidigL&&ADV.huidigL.filter(h=>h.n.trim()||h.v).length) ? ADV.huidigL.filter(h=>h.n.trim()||h.v).map(h=>({n:h.n||'Huidige polis', v:h.v, verval:h.verval}))
+          : (ADV.nu ? [{n:'Huidige losse polissen samen (opgave klant)', v:ADV.nu}] : []), history:[] }; }
+function advCommit(status, wijze){ const f = advFam(); f.id = nid('fam_');
+  f.history = [{d:today(), t: wijze==='direct' ? 'Dossier aangemaakt tijdens het adviesgesprek; klant tekende meteen in kantoor.' : 'Offerte opgesteld door makelaar Marc en gemaild naar de klant.'}];
+  f.status = status; DB.families.push(f); save(); return f; }
+function advSend(){ const f = advCommit('offerte');
+  logEvent('Makelaar Marc verstuurde een offerte naar '+f.name+' ('+eurM(quote(f).total)+').');
+  FLASH='✓ Offerte verstuurd naar '+f.name+' ('+eurM(quote(f).total)+') — de klant kan ze in het klantportaal bekijken en ondertekenen.';
+  ADV=null; go('m_kln'); mkOpen(f.id); }
+function advSignNow(){ const f = advCommit('offerte','direct');
+  sigOpen('Klant ondertekent nu', 'Geef het toestel aan de klant voor de handtekening.', sig=>{
+    activate(f, sig, 'makelaar'); ADV=null; go('m_kln'); mkOpen(f.id); }); }
+function commissieStart(f){
+  const data = (f.huidig||[]).map(h=>h.verval).filter(v=>parseVerval(v)).sort((a,b)=>parseVerval(a)-parseVerval(b));
+  return data.length ? 'per dekking vanaf de vervaldag (eerste: '+esc(fmtVerval(data[0]))+')' : 'direct';
+}
+VIEWS.m_com = () => { const act = DB.families.filter(f=>f.status==='actief');
+  const tot = act.reduce((s,f)=>s+quote(f).total*DB.products.comm.makelaar/100,0);
+  return `<h1>Mijn commissies</h1>
+  <p class="hint">Volledig transparant — hetzelfde percentage (${DB.products.comm.makelaar}%) dat P&V en de klant ook kunnen zien. Uw commissie loopt mee met de premie: <b>per dekking pas vanaf de vervaldag van de oude polis</b> — op de gratis vangnetperiode verdient niemand, ook u niet.</p>
+  <div class="kpis"><div class="kpi"><b>${act.length}</b><span>actieve polissen</span></div>
+  <div class="kpi"><b>${eur(act.reduce((s,f)=>s + (commissieStart(f)==='direct' ? quote(f).total*DB.products.comm.makelaar/100 : 0),0))}</b><span><b>lopend vandaag</b> — commissie op dekkingen die nu al premie dragen</span></div>
+  <div class="kpi"><b>${eur(tot)}</b><span>per maand <b>op kruissnelheid</b> (zodra alle dekkingen premie dragen)</span></div>
+  <div class="kpi"><b>${eur(tot*12)}</b><span>per jaar, zolang klanten blijven</span></div></div>
+  <div class="scrollx"><table class="tbl" style="min-width:560px"><thead><tr><th>Gezin</th><th class="r">Premie/maand</th><th class="r">Lopend vandaag</th><th class="r">Op kruissnelheid</th><th>Loopt vanaf</th></tr></thead><tbody>
+  ${act.map(f=>{const kr=quote(f).total*DB.products.comm.makelaar/100; const nu0=commissieStart(f)==='direct'?kr:0;
+    return `<tr><td>${esc(f.name)}</td><td class="r">${eur(quote(f).total)}</td><td class="r">${eur(nu0)}</td><td class="r">${eur(kr)}</td><td class="small">${commissieStart(f)}</td></tr>`;}).join('')}
+  </tbody></table></div>
+  <p class="small">Vereenvoudiging in de demo: "lopend vandaag" is € 0 zolang er nog vervaldagen openstaan en groeit in werkelijkheid per dekking die overschuift.</p>
+  <div class="calm" style="margin-top:12px">Het model beloont <b>klantbehoud</b>: één gezinspolis die meegroeit betekent dat uw commissie elk jaar terugkomt, in plaats van telkens opnieuw te moeten verkopen bij elk nieuw voertuig.</div>`;
+};
+
+/* ---------- BEHEERDER ---------- */
+VIEWS.b_par = () => { const p = DB.products;
+  return `<h1>Productparameters</h1>
+  <p class="hint">Deze knoppen sturen de hele demo: elke nieuwe offerte en elk dashboard rekent ermee. Transparantie geldt ook intern — iedereen ziet dezelfde cijfers.</p>
+  <div class="grid2">
+  <div class="card"><h2>Prijs & korting</h2>
+    <div class="sl"><label>Bundelkorting gezinspolis <output id="o_bundel">${p.bundel}%</output></label>
+      <input type="range" min="0" max="25" value="${p.bundel}" oninput="parSet('bundel',this.value,'%')"></div>
+    <div class="sl"><label>Aanname schadelast <output id="o_schadelast">${p.schadelast}%</output></label>
+      <input type="range" min="40" max="95" value="${p.schadelast}" oninput="parSet('schadelast',this.value,'%')"></div>
+    <p class="small"><b>Demo-vereenvoudiging, bewust benoemd:</b> de tarieven zijn hier niet risicogestuurd (geen leeftijd, bonus-malus, regio of frequentie × gemiddelde kost per risicoklasse — dat is een opdracht voor actuariaat vóór lancering). De schadelastschuif toont wat er gebeurt als de wérkelijke schadelast afwijkt van de tarifering. Beheerskosten staan vast op ${p.beheer}% van de premie; in een echt dossier splitst dat in een vast deel (IT, structuur) en een variabel deel per polis.</p>
+    <h3>Basispremies per type (per maand, excl. waarde-opslag)</h3>
+    <table class="tbl"><tbody>${Object.entries(VT).map(([k,t])=>`<tr><td>${t.icon} ${t.label}</td><td class="r">${eur(t.base)}</td></tr>`).join('')}</tbody></table>
+  </div>
+  <div class="card"><h2>Commissies per kanaal</h2>
+    ${['makelaar','winkel','dealer','online'].map(k=>`<div class="sl"><label>${({makelaar:'Makelaar',winkel:'Fietsenwinkel',dealer:'Autodealer',online:'Online/direct'})[k]} <output id="o_c_${k}">${p.comm[k]}%</output></label>
+    <input type="range" min="0" max="25" value="${p.comm[k]}" oninput="parComm('${k}',this.value)"></div>`).join('')}
+    <p class="small"><b>Doelmix-aanname voor de uitrol</b> (expliciet, zodat niemand moet raden): 70% makelaar, 20% winkel &amp; dealer, 10% online → gewogen kanaalcommissie ± 13,5%. De business case op de pitchpagina rekent bewust conservatiever met de volle makelaarsbasis (15% + 3% overhead = 18%). De demo weegt live volgens de échte portefeuillemix.</p>
+    <div class="calm" id="crbox"></div>
+  </div></div>`;
+};
+AFTER.b_par = () => updCR();
+function parSet(k,v,unit){ DB.products[k]=+v; document.getElementById('o_'+k).textContent=v+unit; save(); updCR(); }
+function parComm(k,v){ DB.products.comm[k]=+v; document.getElementById('o_c_'+k).textContent=v+'%'; save(); updCR(); }
+/* commissie gewogen volgens de echte kanaalmix van de actieve portefeuille */
+function gewogenComm(){
+  const act = DB.families.filter(f=>f.status==='actief');
+  if(!act.length) return DB.products.comm.makelaar;
+  let prem=0, comm=0;
+  act.forEach(f=>{ const q=quote(f).total; prem+=q; comm+=q*CHANPCT(f.channel)/100; });
+  return comm/prem*100;
+}
+function combinedRatio(){ const p=DB.products;
+  /* schadelast-% is gedefinieerd bij de referentiekorting van 10%; schade in euro's verandert niet
+     als de korting wijzigt, dus de ratio op de nettopremie beweegt mee met de bundelkorting */
+  const effSchade = p.schadelast * 0.9 / Math.max(0.05, 1 - p.bundel/100);
+  return effSchade + p.beheer + gewogenComm() + p.overhead; }
+function bundelKost(){
+  return DB.families.filter(f=>f.status==='actief').reduce((s,f)=>s+quote(f).bundel,0);
+}
+function updCR(){ const cr = combinedRatio(); const el=document.getElementById('crbox'); if(!el) return;
+  const kleur = cr<95?'var(--ok)':cr<=100?'var(--partial)':'var(--bad)';
+  const effS = DB.products.schadelast * 0.9 / Math.max(0.05, 1 - DB.products.bundel/100);
+  el.innerHTML = `Indicatieve combined ratio met deze knoppen: <b style="color:${kleur};font-size:1.3rem">${cr.toFixed(0)}%</b><br>
+  <span class="small">= effectieve schadelast ${effS.toFixed(1)}% (schade in euro's verandert niet mee met de korting: ${DB.products.schadelast}% bij de referentiekorting van 10% → gedeeld door de nettopremie bij ${DB.products.bundel}% korting) + beheer ${DB.products.beheer}% + kanaalcommissie ${gewogenComm().toFixed(1)}% (gewogen volgens de échte kanaalmix, geen plat gemiddelde) + distributie-overhead ${DB.products.overhead}%. Onder 95% gezond, boven 100% verlies. Met de standaardknoppen: 90%, dezelfde uitkomst als de business case op de pitchpagina. Schuif de bundelkorting naar 25% en u ziet de ratio stijgen — de korting is niet gratis.</span><br>
+  <span class="small">In euro's kost de bundelkorting momenteel <b>${eur(bundelKost())}/maand</b> premievolume (zie portefeuille) — de prijs van het klantbehoud.</span>`; }
+VIEWS.b_pf = () => { const act = DB.families.filter(f=>f.status==='actief'); const off = DB.families.filter(f=>f.status==='offerte');
+  const vol = act.reduce((s,f)=>s+quote(f).total,0); const cr = combinedRatio();
+  return `<h1>Portefeuille</h1>
+  <div class="kpis">
+    <div class="kpi"><b>${act.length}</b><span>actieve gezinspolissen</span></div>
+    <div class="kpi"><b>${off.length}</b><span>open offertes</span></div>
+    <div class="kpi"><b>${eur(vol)}</b><span>premievolume per maand</span></div>
+    <div class="kpi"><b style="color:${cr<95?'var(--ok)':cr<=100?'var(--partial)':'var(--bad)'}">${cr.toFixed(0)}%</b><span>combined ratio (indicatief)</span></div>
+  </div>
+  <table class="tbl"><thead><tr><th>Gezin</th><th>Kanaal</th><th>Leden</th><th>Voertuigen</th><th class="r">Premie/maand</th><th>Status</th><th>Polisnr.</th></tr></thead><tbody>
+  ${DB.families.map(f=>`<tr><td><b>${esc(f.name)}</b></td><td>${esc(f.channel)}</td><td>${f.members.length}</td><td>${f.vehicles.length}</td><td class="r">${eur(quote(f).total)}</td><td>${badge(f.status)}</td><td>${f.polisNr||'—'}</td></tr>`).join('')}
+  </tbody></table>
+  <p class="small" style="margin-top:8px">Bundelkorting in de actieve portefeuille: <b>${eur(bundelKost())}/maand</b> aan weggegeven premie — de expliciete prijs van het klantbehoud. Let op bij migratie van bestaande P&amp;V-klanten: wie al meerdere losse P&amp;V-polissen heeft, krijgt die korting zonder nieuwe omzet (cannibalisatie); dat hoort in de business case.</p>
+  <div class="note" style="margin-top:12px"><b>Acceptatieregels (vereenvoudigd voor de demo):</b> speedpedelec en brommer krijgen de wettelijk verplichte BA binnen de gezinspolis, mét eigen verzekeringsattest per voertuig; leasevoertuigen worden aanvullend gedekt (casco via lease, leasecontract wordt opgevraagd); deelmobiliteit en openbaar vervoer tellen voor eigen letsel. Juridische toetsing (o.a. art. 29bis-overlap, attesten, eigen letsel te voet/OV) door een productspecialist blijft nodig vóór lancering.</div>`;
+};
+VIEWS.b_log = () => `<h1>Activiteitenlog</h1>
+  <p class="hint">Alles wat in de demo gebeurt — ook dit is transparantie: elk kanaal ziet dezelfde waarheid.</p>
+  <ul class="timeline">${DB.log.map(l=>`<li><b>${l.d}</b> — ${esc(l.t)}</li>`).join('')}</ul>`;
+
+/* ---------- FIETSVERKOPER (POS) ---------- */
+let POS = null, LASTPOS = null;
+function klantZoeker(sel, filterId, pick){
+  const q = (sel.filter||'').toLowerCase();
+  const hits = DB.families.filter(f=>f.status==='actief' && f.name.toLowerCase().includes(q));
+  return `<div class="fld"><label for="${filterId}">Zoek bestaande klant (naam)</label>
+    <input id="${filterId}" value="${esc(sel.filter||'')}" placeholder="typ om te zoeken…" oninput="${pick}Filter(this.value)"></div>
+    <div class="choice">
+      ${hits.map(f=>`<button aria-pressed="${sel.klant===f.id}" onclick="${pick}Kies('${f.id}')"><b>${esc(f.name)}</b><small>bestaande P&amp;V-mobiliteitsklant (${f.polisNr}) — voertuig wordt gewoon toegevoegd</small></button>`).join('') || '<p class="small">Geen klant gevonden met die naam.</p>'}
+      <button aria-pressed="${sel.klant==='nieuw'}" onclick="${pick}Kies('nieuw')"><b>Nieuwe klant</b><small>start een gezinspolis</small></button>
+    </div>`;
+}
+VIEWS.f_pos = () => { if(!POS) POS = {step:1, type:LASTPOS?.type||'ebike', value:LASTPOS?.value||3000, label:LASTPOS?.label||'E-bike', mode:LASTPOS?.mode||'koop', frame:'', filter:'', klant:null, nieuw:{naam:'',email:'',geb:''}, mailSent:false};
+  const steps=['Fiets','Klant','Prijs — open kaarten','Handtekening','Bewijs mee'];
+  const stepHTML = steps.map((s,i)=>`<span class="step ${POS.step===i+1?'cur':POS.step>i+1?'done':''}"><i>${POS.step>i+1?'✓':i+1}</i>${s}</span>`).join('');
+  let body='';
+  if(POS.step===1){ body=`<div class="card" style="max-width:640px"><h2>Welke fiets gaat mee?</h2>
+    <div class="choice">${['fiets','ebike','sportfiets','speedpedelec'].map(k=>`<button aria-pressed="${POS.type===k}" onclick="posGrab();POS.type='${k}';POS.label=VT['${k}'].label;render()"><b>${VT[k].icon} ${VT[k].label}</b></button>`).join('')}</div>
+    <div class="fld"><label>Verkoopprijs (€)</label><input id="pf_val" type="number" value="${POS.value}" min="200" oninput="POS.value=+this.value||POS.value"></div>
+    <div class="fld"><label>Framenummer (voor de diefstaldekking)</label><input id="pf_frame" value="${esc(POS.frame)}" placeholder="bv. WBL123456 — staat op het frame of de factuur" oninput="POS.frame=this.value"></div>
+    <div class="choice"><button aria-pressed="${POS.mode==='koop'}" onclick="posMode('koop')"><b>Koop</b><small>klant koopt de fiets</small></button>
+    <button aria-pressed="${POS.mode==='lease'}" onclick="posMode('lease')"><b>Leasing</b><small>via werkgever — casco zit in lease, polis dekt de rest</small></button></div>
+    <p class="small" id="f_err" style="color:var(--bad)"></p>
+    <button class="btn" onclick="posNext1()">Volgende</button></div>`; }
+  if(POS.step===2){ body=`<div class="card" style="max-width:680px"><h2>Wie is de klant?</h2>
+    ${klantZoeker(POS,'pf_zoek','pos')}
+    ${POS.klant==='nieuw' ? `<div class="fld"><label>Naam klant</label><input id="pf_naam" value="${esc(POS.nieuw.naam)}" placeholder="bv. Familie Claes"></div>
+    <div class="fld"><label>E-mailadres (voor het verzekeringsbewijs)</label><input id="pf_email" value="${esc(POS.nieuw.email)}" placeholder="naam@mail.be"></div>
+    <div class="fld"><label>Geboortedatum klant</label><input id="pf_geb" type="date" value="${esc(POS.nieuw.geb)}"></div>
+    <p class="small">Identiteit controleren gebeurt in de echte flow via eID of itsme; hier volstaan deze velden.</p>`
+    : POS.klant ? `<div class="fld"><label>E-mailadres voor het bewijs (vooringevuld uit het dossier, aanpasbaar)</label><input id="pf_email" value="${esc(POS.nieuw.email||fam(POS.klant)?.email||'')}"></div>`:''}
+    <p class="small" id="f_err" style="color:var(--bad)"></p>
+    <button class="btn" onclick="posNaarPrijs()">Toon de prijs</button>
+    <button class="btn ghost" onclick="posGrab2();POS.step=1;render()">Terug</button></div>`; }
+  if(POS.step===3){ const v={type:POS.type, value:POS.value, lease:POS.mode==='lease'}; const m=vehMonthly(v);
+    const bestaand = POS.klant && POS.klant!=='nieuw' ? fam(POS.klant) : null;
+    const jaar = m*12*(bestaand?(1-DB.products.bundel/100):1);
+    let markt='';
+    if(POS.mode==='lease'){
+      markt = `<p class="small" style="margin-top:12px"><b>Geen marktvergelijking bij leasing:</b> het leasecontract dekt de fiets zelf (casco); deze polis dekt alleen wat daarbuiten valt (eigen letsel, aansprakelijkheid, pech). Dat vergelijken met een volledige koopfietsverzekering zou appels met peren zijn.</p>`;
+    } else if(POS.type==='speedpedelec'){
+      markt = `<p class="small" style="margin-top:12px"><b>Geen betrouwbare marktreferentie voor speedpedelecs</b> op de vergelijkingssites — die tonen we dan ook niet. Wat telt: de verplichte BA zit hier inbegrepen.</p>`;
+    } else {
+      const ref = bikeRefFor(POS.value);
+      if(ref){
+        const rows = ref.rows.map(r=>({...r, pv:false})).concat([{n:'Mobiliteitspolis', v:jaar, pv:true}]);
+        markt = `<h3 style="margin-top:12px">Vergelijk zelf met de markt (per jaar, geschaald naar een fiets van ${eur0(POS.value)})</h3>
+        ${cmpRows(rows,'/jaar','Richtprijzen vergelijkingssites 2026 (diefstal + schade + bijstand, meestal zónder eigen letsel — dat zit hier wél in).'+(ref.extrap?' Boven € 2.000 zijn de concurrentbedragen geëxtrapoleerd uit de publieke richtprijzen — indicatief, en dat zeggen we er eerlijk bij.':'')+' Als een concurrent goedkoper is, ziet u dat gewoon staan.')}`;
+      } else {
+        markt = `<p class="small" style="margin-top:12px"><b>Boven € 6.000 staat er geen bruikbare marktreferentie</b> op de vergelijkingssites — dan tonen we liever geen staafjes dan misleidende. Het verkoopargument blijft: één gezinspolis, dekking ook voor eigen letsel, en elke volgende fiets schuift er zo bij.</p>`;
+      }
+    }
+    body=`<div class="grid2"><div class="card"><h2>De prijs, zwart op wit (klantweergave)</h2>
+      <table class="tbl"><tbody>
+      <tr><td>${VT[POS.type].icon} ${esc(POS.label)} (${eur0(POS.value)}${POS.mode==='lease'?', leasing':''})<br><span class="small">${dekFor({type:POS.type, lease:POS.mode==='lease'})}</span></td><td class="r">${eurM(m)}</td></tr>
+      ${bestaand?`<tr><td>Bundelvoordeel: zit al in de gezinspolis van ${esc(bestaand.name)} (−${DB.products.bundel}%)</td><td class="r" style="color:var(--ok)">−${eur(m*DB.products.bundel/100)}</td></tr>`:''}
+      <tr class="tot"><td>Per maand</td><td class="r">${eur(m*(bestaand?1-DB.products.bundel/100:1))}</td></tr>
+      <tr><td class="small">Op jaarbasis · waarvan ${DB.products.comm.winkel}% vergoeding voor de winkel (transparant)</td><td class="r small">${eur(jaar)}/jaar</td></tr></tbody></table>
+      ${markt}
+      ${POS.mode==='lease'
+        ? `<div class="calm"><b>Wat deze polis toevoegt aan het leasecontract:</b> eigen letsel van de fietser, aansprakelijkheid onderweg en pechbijstand — de drie dingen die een leasecontract typisch níét dekt. En het is meteen een gezinspolis die meegroeit.</div>`
+        : bestaand
+        ? `<p class="small">Uw gezinspolis dekt méér dan de losse referenties hierboven (eigen letsel, gezinsbundel, polis groeit mee) — daarom loont blijven, ook waar een losse polis goedkoper oogt.</p>`
+        : `<div class="calm"><b>Niet de goedkoopste op deze ene fiets — wat u er extra voor krijgt:</b> eigen letsel inbegrepen (P&V Go en de meeste fietspolissen dekken dat níét en zijn geen gezinspolis — daarom staan ze goedkoper), dekking ook bij sportief gebruik en e-MTB, en dit is meteen een <b>gezinspolis</b>: de volgende fiets, de auto of de brommer schuift er zonder nieuw contract bij, mét ${DB.products.bundel}% bundelvoordeel vanaf het tweede voertuig.</div>`}
+      ${POS.offerSent?`<p class="small" style="color:var(--ok)">✓ Offerte gemaild — de klant kan thuis nalezen en in het klantportaal tekenen. U vindt ze terug onder "Mijn verkopen" bij openstaande offertes.</p>`:`<button class="btn sec" style="margin-top:8px" onclick="posMailOffer()">Offerte mailen, later tekenen</button>`}</div>
+    <div><details class="card" style="border-style:dashed;border-color:var(--burgundy)"><summary style="cursor:pointer;font-weight:700;color:var(--burgundy)">Alleen voor u (winkel) — klik om te openen, klapt dicht voor de klant</summary>
+      <ul><li>${POS.mode==='lease'?'Dekking eigen letsel + aansprakelijkheid + pech; de casco zit in het leasecontract — beloof dus géén diefstaldekking.':'Dekking diefstal, schade, pech én eigen letsel — meteen vanaf de winkel.'}</li>
+      ${bestaand?'<li>Bestaande klant: <b>geen nieuwe polis</b>, de fiets schuift in de gezinspolis. Dertig seconden werk.</li>':'<li>Nieuwe klant: de fiets is de instap in een gezinspolis die later auto, brommer en meer dekt.</li>'}
+      <li>Uw vergoeding: <b>${DB.products.comm.winkel}%</b> doorlopend = <b>${eur(jaar*DB.products.comm.winkel/100)}/jaar</b>${bestaand?'':` + eenmalige aanbrengvergoeding <b>${eur(DB.products.aanbreng)}</b> voor een nieuw gezin`}. Zie "Mijn verkopen" voor uw totaal.</li></ul></details>
+      <div class="card">
+      <button class="btn orange" onclick="POS.step=4;render()">Klant akkoord — onderteken op tablet</button>
+      <button class="btn ghost" onclick="POS.step=2;render()">Terug</button></div></div></div>`; }
+  if(POS.step===4){ body=`<div class="card" style="max-width:560px"><h2>Handtekening van de klant</h2>
+    <p>Geef de tablet aan de klant. Eén handtekening en de dekking is actief — de klant rijdt verzekerd de winkel uit.</p>
+    <button class="btn orange" onclick="posTeken()">Open handtekenveld</button>
+    <button class="btn ghost" onclick="POS.step=3;render()">Terug</button></div>`; }
+  if(POS.step===5){ const f = fam(POS.doneFam);
+    body=`<div class="card" style="max-width:720px"><h2>✅ Klaar — dekking actief</h2>
+    <p>De ${esc(POS.label)} van ${eur0(POS.value)} is verzekerd onder polis <b>${f?f.polisNr:''}</b> (${esc(f?f.name:'')}).</p></div>
+    <div class="doc" style="max-width:560px">
+      <div class="dochead"><b>Verzekeringsbewijs fiets</b><span>${today()}</span></div>
+      <table><tr><td style="padding-right:14px">Voertuig</td><td><b>${esc(POS.label)}</b> (${eur0(POS.value)})${POS.mode==='lease'?' — <b>leasing</b>, casco via het leasecontract':''}</td></tr>
+      <tr><td style="padding-right:14px">Framenummer</td><td><b>${esc(POS.frame||(POS.mode==='lease'?'via de leasemaatschappij':'—'))}</b></td></tr>
+      <tr><td style="padding-right:14px">Polisnummer</td><td>${f?f.polisNr:''}</td></tr>
+      <tr><td style="padding-right:14px">Verzekeringnemer</td><td>${esc(f?f.name:'')}</td></tr>
+      <tr><td style="padding-right:14px">Dekking</td><td>${POS.mode==='lease'?'eigen letsel + aansprakelijkheid + pech (casco via het leasecontract)':'diefstal + schade + pech + eigen letsel'}, vanaf vandaag</td></tr></table>
+      <p class="small">Demodocument — geen echt verzekeringsbewijs.</p>
+      <div class="noprint" style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn sec" onclick="window.print()">Afdrukken</button>
+        <button class="btn" onclick="POS.mailSent=true;render()">${POS.mailSent?'✓ Verstuurd':'Verstuur per e-mail'}</button>
+      </div>
+      ${POS.mailSent?`<p class="small" style="color:var(--ok)">Bewijs verzonden naar ${esc(POS.nieuw.email||'het e-mailadres uit het dossier')} (demo).</p>`:''}
+    </div>
+    <div class="calm" style="max-width:720px">Uw vergoeding is geregistreerd en zichtbaar voor u, voor P&amp;V én voor de klant — iedereen ziet hetzelfde.</div>
+    <button class="btn" onclick="POS=null;render()">Nieuwe verkoop (type, prijs en koop/lease blijven staan; framenummer wordt gewist)</button>`; }
+  return `<h1>Verkoop + verzekering aan de kassa</h1><p class="hint">Doel: klaar in minder dan vijf minuten, op deze tablet.</p><div class="steps">${stepHTML}</div>${body}`;
+};
+function posGrab(){ const v=document.getElementById('pf_val'); if(v) POS.value=+v.value||POS.value;
+  const fr=document.getElementById('pf_frame'); if(fr) POS.frame=fr.value; }
+function posGrab2(){ const n=document.getElementById('pf_naam'); if(n) POS.nieuw.naam=n.value;
+  const e=document.getElementById('pf_email'); if(e) POS.nieuw.email=e.value;
+  const g=document.getElementById('pf_geb'); if(g) POS.nieuw.geb=g.value; }
+function posMode(m){ posGrab(); POS.mode=m; POS.offerSent=false; render(); }
+function posNext1(){ posGrab(); POS.offerSent=false;
+  if(POS.mode==='koop' && !POS.frame.trim()){ document.getElementById('f_err').textContent='Vul het framenummer in — zonder framenummer geen diefstaldekking.'; return; }
+  POS.step=2; render(); }
+function posFilter(v){ POS.filter=v; const keep=document.activeElement&&document.activeElement.id; render();
+  const el=document.getElementById('pf_zoek'); if(el){ el.focus(); el.setSelectionRange(el.value.length,el.value.length);} }
+function posKies(id){ posGrab2(); POS.klant=id; POS.offerSent=false; render(); }
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+function leeftijd(geb){ const d=new Date(geb); if(isNaN(d)) return null;
+  const n=new Date(); let a=n.getFullYear()-d.getFullYear(); const m=n.getMonth()-d.getMonth();
+  if(m<0||(m===0&&n.getDate()<d.getDate())) a--; return a; }
+function posNaarPrijs(){ posGrab2();
+  const err = document.getElementById('f_err');
+  if(!POS.klant){ err.textContent='Kies eerst een klant (of "Nieuwe klant").'; return; }
+  if(POS.klant==='nieuw'){
+    if(!POS.nieuw.naam.trim()){ err.textContent='Vul de naam van de klant in.'; return; }
+    if(!EMAIL_RE.test(POS.nieuw.email.trim())){ err.textContent='Vul een geldig e-mailadres in (naam@domein.be) — daar sturen we het verzekeringsbewijs naartoe.'; return; }
+    const a = leeftijd(POS.nieuw.geb);
+    if(a===null){ err.textContent='Vul de geboortedatum in — nodig voor de identificatie.'; return; }
+    if(a<0){ err.textContent='De geboortedatum ligt in de toekomst — controleer de invoer.'; return; }
+    if(a<18){ err.textContent='De verzekeringnemer moet meerderjarig zijn (18+). Een minderjarige kan wel meeverzekerd worden op de gezinspolis van een ouder.'; return; }
+    if(a>110){ err.textContent='Controleer de geboortedatum — die lijkt niet te kloppen.'; return; }
+  } else if(POS.nieuw.email && !EMAIL_RE.test(POS.nieuw.email.trim())){ err.textContent='Het e-mailadres voor het bewijs is ongeldig.'; return; }
+  POS.step=3; render(); }
+function posTeken(){
+  sigOpen('Klant ondertekent op de tablet','Dekking gaat in zodra de handtekening bevestigd is.', sig=>{
+    let f;
+    if(POS.klant==='nieuw'){
+      f = { id:nid('fam_'), name:POS.nieuw.naam, status:'offerte', channel:'fietsenwinkel', beheerder:'Karim (fietsenwinkel)',
+        members:[{n:POS.nieuw.naam, r:'volwassene'}], vehicles:[], huidig:[], history:[{d:today(), t:'Gezinspolis gestart in de fietsenwinkel. Aanbrengvergoeding winkel: '+eur(DB.products.aanbreng)+'.'}], signature:null };
+      DB.families.push(f);
+    } else { f = fam(POS.klant); }
+    f.vehicles.push({id:nid('v'), type:POS.type, label:POS.label, value:POS.value, lease:POS.mode==='lease', frame:POS.frame, who:POS.klant==='nieuw'?POS.nieuw.naam:''});
+    f.history.unshift({d:today(), t:'Nieuwe '+POS.label.toLowerCase()+' gekocht en verzekerd bij de fietsenwinkel (Karim). '+(POS.mode==='lease'?'Leasing: casco via leasecontract.':'Framenummer '+(POS.frame||'—')+' geregistreerd.')});
+    const bestond = POS.klant!=='nieuw';
+    (DB.offers||[]).forEach(o=>{ if(o.channel==='fietsenwinkel' && o.naam===f.name && o.status==='verstuurd') o.status='getekend'; });
+    if(f.status!=='actief'){ activate(f, sig, 'fietsenwinkel'); }
+    else { logEvent(f.name+' voegde een '+POS.label.toLowerCase()+' toe via de fietsenwinkel. Premie herberekend naar '+eurM(quote(f).total)+'.'); }
+    const mS = vehMonthly({type:POS.type, value:POS.value, lease:POS.mode==='lease'});
+    const jaarS = mS*12*(bestond?1-DB.products.bundel/100:1);
+    (DB.sales=DB.sales||[]).push({channel:'fietsenwinkel', famName:f.name, desc:POS.label+' '+eur0(POS.value), jaar:jaarS, lease:POS.mode==='lease',
+      pct:DB.products.comm.winkel, comm:jaarS*DB.products.comm.winkel/100, aanbreng:bestond?0:DB.products.aanbreng, d:today()});
+    save();
+    LASTPOS = {type:POS.type, value:POS.value, label:POS.label, mode:POS.mode};
+    POS.doneFam = f.id; POS.step=5; render();
+  }, ['Identiteit klant gecontroleerd (echte flow: eID of itsme)','Klant ontving het informatiedocument (IPID) en de voorwaarden']);
+}
+function offerMark(i,status){ if(!DB.offers||!DB.offers[i]) return;
+  const o = DB.offers[i]; o.status=status;
+  if(status==='getekend'){
+    /* handmatig afvinken boekt de verkoop écht, incl. vergoeding — anders klopt het register niet met de belofte */
+    const pct = o.pct ?? 10;
+    (DB.sales=DB.sales||[]).push({channel:o.channel, famName:o.naam, desc:o.desc+' (getekend via offerte)', jaar:o.jaar, lease:!!o.lease,
+      pct, comm:o.jaar*pct/100, aanbreng:o.aanbreng||0, d:today()});
+    logEvent('Offerte van '+o.naam+' als getekend geboekt; vergoeding en eventuele aanbreng geregistreerd.');
+  }
+  save(); render(); }
+function offerRemail(i){ if(DB.offers&&DB.offers[i]){ const o=DB.offers[i]; o.d=today(); o.remails=(o.remails||0)+1;
+  logEvent('Offerte opnieuw gemaild naar '+o.naam+' ('+o.remails+'×).'); save(); render(); } }
+function salesView(channel, titel, noot){
+  const mijn = (DB.sales||[]).filter(s=>s.channel===channel);
+  const doorl = mijn.reduce((s,x)=>s+x.comm,0), aanb = mijn.reduce((s,x)=>s+x.aanbreng,0);
+  const leaseSom = mijn.filter(s=>s.lease).reduce((s,x)=>s+x.comm,0);
+  return `<h1>${titel}</h1>
+  <p class="hint">Elke regel hieronder toont exact hetzelfde bedrag als de prijsstap waarin u de verkoop afsloot — ook voor voertuigen die u bij een bestaand gezin bijzette.</p>
+  <div class="kpis"><div class="kpi"><b>${mijn.length}</b><span>verkopen met verzekering</span></div>
+  <div class="kpi"><b>${eur(doorl)}</b><span>doorlopende vergoeding per jaar</span></div>
+  <div class="kpi"><b>${eur(aanb)}</b><span>eenmalige aanbrengvergoedingen (${eur(DB.products.aanbreng)}/nieuw gezin)</span></div></div>
+  ${mijn.length?`<div class="scrollx"><table class="tbl" style="min-width:560px"><thead><tr><th>Datum</th><th>Gezin</th><th>Verkoop</th><th class="r">Premie/jaar</th><th class="r">Uw %</th><th class="r">Doorlopend/jaar</th><th class="r">Aanbreng</th></tr></thead><tbody>
+  ${mijn.map(s=>`<tr><td>${s.d}</td><td>${esc(s.famName)}</td><td>${esc(s.desc)}${s.lease?' <span class="badge b-actief" style="background:#e2eaec;color:var(--burgundy)">LEASING</span>':''}</td><td class="r">${eur(s.jaar)}</td><td class="r">${s.pct}%</td><td class="r">${eur(s.comm)}</td><td class="r">${s.aanbreng?eur(s.aanbreng):'—'}</td></tr>`).join('')}</tbody></table></div>
+  ${mijn.some(s=>s.lease)?`<p class="small">Subtotaal doorlopende vergoeding — koop: ${eur(doorl-leaseSom)}/jaar · leasing: ${eur(leaseSom)}/jaar.</p>`:''}`
+  :'<p class="hint">Nog geen verkopen in deze demosessie — sluit er eentje af in de verkoopflow.</p>'}
+  ${(()=>{ const open = (DB.offers||[]).map((o,i)=>({o,i})).filter(x=>x.o.channel===channel && x.o.status==='verstuurd');
+    const afgehandeld = (DB.offers||[]).filter(o=>o.channel===channel && o.status!=='verstuurd').length;
+    return open.length?`<h2 style="margin-top:16px">Openstaande offertes — uw opvolglijst</h2>
+  <div class="scrollx"><table class="tbl" style="min-width:560px"><thead><tr><th>Datum</th><th>Klant</th><th>Offerte</th><th class="r">Premie/jaar</th><th>Geldig</th><th>Actie</th></tr></thead><tbody>
+  ${open.map(x=>`<tr><td>${x.o.d}${x.o.remails?`<br><span class="small" style="color:var(--ok)">✓ ${x.o.remails}× opnieuw gemaild</span>`:''}</td><td>${esc(x.o.naam)}</td><td>${esc(x.o.desc)}</td><td class="r">${eur(x.o.jaar)}</td><td class="small">tot ${geldigTot(x.o.d)}</td>
+  <td style="white-space:nowrap"><button class="btn ghost" onclick="offerRemail(${x.i})">Mail opnieuw</button> <button class="btn ghost" onclick="offerMark(${x.i},'getekend')">✓ getekend</button> <button class="btn ghost" onclick="offerMark(${x.i},'vervallen')">vervallen</button></td></tr>`).join('')}</tbody></table></div>
+  <p class="small">Tekent de klant (thuis, aan de kassa, of via "✓ getekend" na telefonische bevestiging), dan verdwijnt de offerte hier en wordt de verkoop mét vergoeding en eventuele aanbreng in het register geboekt.${afgehandeld?' ('+afgehandeld+' eerdere offerte(s) afgehandeld.)':''}</p>`
+  : (afgehandeld?`<p class="small" style="margin-top:12px">Geen openstaande offertes; ${afgehandeld} eerdere offerte(s) zijn getekend of vervallen.</p>`:'');})()}
+  <div class="calm" style="margin-top:12px">${noot}</div>`;
+}
+VIEWS.f_mijn = () => salesView('fietsenwinkel','Mijn verkopen & vergoeding',
+  'Ter vergelijking: gespecialiseerde fietsverzekeraars betalen tussenpersonen doorgaans 10 à 20%, vaak zonder doorlopend deel (demo-aanname). Hier: '+DB.products.comm.winkel+'% dat élk jaar terugkomt + '+eur(DB.products.aanbreng)+' per nieuw gezin — en de klant die voor zijn volgende fiets naar úw winkel terugkomt, omdat zijn polis hier al loopt. Demo-regel tegen misbruik: de aanbrengvergoeding geldt vanaf een minimale jaarpremie en wordt teruggevorderd bij opzeg binnen het eerste jaar.');
+VIEWS.f_waarom = () => `<h1>Waarom de mobiliteitspolis meeverkopen?</h1>
+  <div class="grid3">
+  <div class="card"><h3>⏱️ Sneller dan vandaag</h3><p>Geen apart aanvraagformulier per verzekeraar: fiets kiezen, klant kiezen, tekenen. Bestaande P&V-gezinnen: dertig seconden, de fiets schuift in de bestaande polis.</p></div>
+  <div class="card"><h3>💶 Eerlijke, zichtbare marge</h3><p>U krijgt ${DB.products.comm.winkel}% van de premie, en dat percentage is zichtbaar voor iedereen — ook voor de klant. Geen verborgen kickbacks die het vertrouwen schaden.</p></div>
+  <div class="card"><h3>🤝 De klant komt terug</h3><p>De gezinspolis groeit mee: wie bij u de eerste fiets verzekert, komt voor de tweede ook bij u. U wordt een vast mobiliteitspunt, geen eenmalige verkoop.</p></div>
+  <div class="card"><h3>🔍 Transparantie verkoopt</h3><p>Het prijsscherm toont de marktvergelijking openlijk. Klanten die zien dat er niets verstopt is, beslissen sneller — in de winkel, niet thuis "na nog even vergelijken".</p></div>
+  </div>`;
+
+/* ---------- AUTOVERKOPER (POS) ---------- */
+let APOS = null;
+/* demo-opsplitsing van de autopremie, voor de eerlijke BA-vergelijking */
+const AUTOSPLIT = {ba:0.45, omnium:0.35, bestuurder:0.12, pech:0.08};
+VIEWS.a_pos = () => { if(!APOS) APOS = {step:1, merk:'', value:32000, plate:'', chassis:'', filter:'', klant:null, nieuw:{naam:'',email:'',geb:''}, mailSent:false};
+  const steps=['Wagen','Klant','Prijs — open kaarten','Handtekening','Groene kaart'];
+  const stepHTML = steps.map((s,i)=>`<span class="step ${APOS.step===i+1?'cur':APOS.step>i+1?'done':''}"><i>${APOS.step>i+1?'✓':i+1}</i>${s}</span>`).join('');
+  let body='';
+  if(APOS.step===1){ body=`<div class="card" style="max-width:560px"><h2>Welke wagen levert u af?</h2>
+    <div class="fld"><label>Merk &amp; model</label><input id="pa_merk" value="${esc(APOS.merk)}" placeholder="bv. VW Golf"></div>
+    <div class="fld"><label>Catalogusprijs (€)</label><input id="pa_val" type="number" value="${APOS.value}"></div>
+    <div class="fld"><label>Kenteken (leeg laten als nog in aanvraag)</label><input id="pa_plate" value="${esc(APOS.plate)}" placeholder="1-ABC-123"></div>
+    <div class="fld"><label>Chassisnummer (verplicht zolang er geen kenteken is)</label><input id="pa_chassis" value="${esc(APOS.chassis)}" placeholder="VIN, 17 tekens — staat in uw dealersysteem"></div>
+    <p class="small">In de echte flow komen merk, prijs en chassisnummer rechtstreeks uit uw dealersysteem (DMS-koppeling); hier tikt u ze eenmalig in.</p>
+    <p class="small" id="a_err" style="color:var(--bad)"></p>
+    <button class="btn" onclick="aposNext1()">Volgende</button></div>`; }
+  if(APOS.step===2){ body=`<div class="card" style="max-width:680px"><h2>Wie is de koper?</h2>
+    ${klantZoeker(APOS,'pa_zoek','apos')}
+    ${APOS.klant==='nieuw' ? `<div class="fld"><label>Naam klant</label><input id="pa_naam" value="${esc(APOS.nieuw.naam)}" placeholder="bv. Familie Mertens"></div>
+    <div class="fld"><label>E-mailadres (voor de groene kaart)</label><input id="pa_email" value="${esc(APOS.nieuw.email)}" placeholder="naam@mail.be"></div>
+    <div class="fld"><label>Geboortedatum koper</label><input id="pa_geb" type="date" value="${esc(APOS.nieuw.geb)}"></div>
+    <p class="small">Identiteit en rijbewijs controleren gebeurt in de echte flow via eID of itsme; hier volstaan deze velden.</p>`
+    : APOS.klant ? `<div class="fld"><label>E-mailadres voor de groene kaart (vooringevuld uit het dossier, aanpasbaar)</label><input id="pa_email" value="${esc(APOS.nieuw.email||fam(APOS.klant)?.email||'')}"></div>`:''}
+    <p class="small" id="a_err" style="color:var(--bad)"></p>
+    <button class="btn" onclick="aposNext2()">Toon de premie</button>
+    <button class="btn ghost" onclick="APOS.step=1;render()">Terug</button></div>`; }
+  if(APOS.step===3){ const v={type:'auto', value:APOS.value, lease:false}; const m=vehMonthly(v);
+    const bestaand = APOS.klant && APOS.klant!=='nieuw' ? fam(APOS.klant) : null;
+    const jaar=m*12*(bestaand?1-DB.products.bundel/100:1);
+    const baJaar = jaar*AUTOSPLIT.ba;
+    const baRows = REF.autoBA.map(r=>({...r,pv:false})).concat([{n:'Mobiliteitspolis — alleen het BA-deel', v:baJaar, pv:true}]);
+    body=`<div class="grid2"><div class="card"><h2>De premie, zwart op wit (klantweergave)</h2>
+      <table class="tbl"><tbody>
+      <tr><td>🚗 ${esc(APOS.merk||'Wagen')} (${eur0(APOS.value)})<br><span class="small">${VT.auto.dek}</span></td><td class="r">${eurM(m)}</td></tr>
+      <tr><td class="small">waarvan: BA ${eur(m*AUTOSPLIT.ba)} · omnium ${eur(m*AUTOSPLIT.omnium)} · bestuurdersdekking ${eur(m*AUTOSPLIT.bestuurder)} · pech ${eur(m*AUTOSPLIT.pech)}</td><td></td></tr>
+      ${bestaand?`<tr><td>Bundelvoordeel gezinspolis ${esc(bestaand.name)} (−${DB.products.bundel}%)</td><td class="r" style="color:var(--ok)">−${eur(m*DB.products.bundel/100)}</td></tr>`:''}
+      <tr class="tot"><td>Per maand</td><td class="r">${eur(m*(bestaand?1-DB.products.bundel/100:1))}</td></tr>
+      <tr><td class="small">Op jaarbasis · waarvan ${DB.products.comm.dealer}% vergoeding voor de dealer (transparant)</td><td class="r small">${eur(jaar)}/jaar</td></tr></tbody></table>
+      <h3 style="margin-top:12px">Eerlijke vergelijking: alléén het BA-deel naast kale BA-polissen (per jaar)</h3>
+      ${cmpRows(baRows,'/jaar','Referenties: VW Golf, ervaren bestuurder, laagste bonus-malus (vergelijkingssites, jan. 2026) — het profiel van uw klant kan afwijken. Voor alléén BA kan de klant elders goedkoper terecht; een vergelijkbaar vólledig pakket (BA + omnium + bijstand) kost bij concurrenten doorgaans € 700 à € 900/jaar (indicatie, geen publieke bron — daarom geen staafje). Dat zeggen we er gewoon bij.')}
+      <div class="calm">${bestaand?`Deze wagen schuift in de bestaande gezinspolis — de dekking van het hele gezin (fietsen, brommer, eigen letsel) loopt gewoon door. U geniet het gezinsvoordeel van −${DB.products.bundel}%: daarom ligt uw BA-deel (${eur(baJaar)}/jaar) lager dan voor een nieuwe klant.`:'Waarom méér betalen dan kale BA? Omdat dit meteen een <b>gezinspolis</b> is: de fietsen, brommers en het eigen letsel van het hele gezin kunnen er zonder nieuw contract bij, met bundelvoordeel. De dekkingstabel hieronder toont het verschil per risico.'}</div>
+      ${dekTabel()}
+      ${APOS.offerSent?`<p class="small" style="color:var(--ok)">✓ Offerte gemaild naar ${esc(APOS.nieuw.email||'het dossieradres')} — de klant kan thuis rustig nalezen en in het klantportaal tekenen. Geen groene kaart tot er getekend is. U vindt ze terug onder "Mijn verkopen".</p>`:`<button class="btn sec" style="margin-top:8px" onclick="aposMailOffer()">Offerte mailen, later tekenen</button>`}
+      </div>
+    <div><details class="card" style="border-style:dashed;border-color:var(--burgundy)"><summary style="cursor:pointer;font-weight:700;color:var(--burgundy)">Alleen voor u (dealer) — klik om te openen, klapt dicht voor de klant</summary>
+      <ul><li>Handtekening nu = <b>voorlopige groene kaart nu</b>: de wagen kan ingeschreven en afgeleverd worden.</li>
+      ${bestaand?'<li>Bestaande klant: wagen toevoegen aan de gezinspolis, klaar in één minuut.</li>':'<li>Nieuwe klant: de wagen is de instap; fietsen en brommers van het gezin kunnen er zo bij.</li>'}
+      <li>Uw vergoeding: <b>${DB.products.comm.dealer}%</b> doorlopend = <b>${eur(jaar*DB.products.comm.dealer/100)}/jaar</b>${bestaand?'':` + eenmalige aanbrengvergoeding <b>${eur(DB.products.aanbreng)}</b>`}. <b>Die blijft ook als een makelaar het dossier later overneemt.</b> Zie "Mijn verkopen".</li></ul></details>
+      <div class="card">
+      <button class="btn orange" onclick="APOS.step=4;render()">Klant akkoord — onderteken</button>
+      <button class="btn ghost" onclick="APOS.step=2;render()">Terug</button></div></div></div>`; }
+  if(APOS.step===4){ body=`<div class="card" style="max-width:560px"><h2>Handtekening van de koper</h2>
+    <p>Eén handtekening: de BA is actief en de voorlopige groene kaart wordt meteen aangemaakt én gemaild.</p>
+    <button class="btn orange" onclick="aposTeken()">Open handtekenveld</button>
+    <button class="btn ghost" onclick="APOS.step=3;render()">Terug</button></div>`; }
+  if(APOS.step===5){ const f=fam(APOS.doneFam);
+    body=`<div class="card" style="max-width:720px"><h2>✅ Verzekerd de baan op</h2>
+    <p>De ${esc(APOS.merk||'wagen')} is gedekt onder polis <b>${f?f.polisNr:''}</b> (${esc(f?f.name:'')}).</p>
+    <button class="btn" onclick="APOS=null;render()">Nieuwe aflevering starten</button></div>
+    <div class="greencard">
+      <h3>Internationaal verzekeringsbewijs (groene kaart) — voorlopig</h3>
+      <table><tr><td>Voertuig</td><td><b>${esc(APOS.merk||'Wagen')}</b></td></tr>
+      <tr><td>Kenteken</td><td><b>${esc(APOS.plate||'in aanvraag')}</b></td></tr>
+      <tr><td>Chassisnummer</td><td><b>${esc(APOS.chassis || (APOS.plate?'niet vereist (kenteken bekend)':'—'))}</b></td></tr>
+      <tr><td>Polisnummer</td><td>${f?f.polisNr:''}</td></tr>
+      <tr><td>Verzekeringnemer</td><td>${esc(f?f.name:'')}</td></tr>
+      <tr><td>Geldig</td><td>van ${today()} tot ${plusDays(39)} — de definitieve kaart stuurt P&amp;V vóór die datum automatisch per post en e-mail</td></tr></table>
+      <p class="small">Demodocument — geen echt verzekeringsbewijs.</p>
+      <div class="noprint" style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn sec" onclick="window.print()">Afdrukken</button>
+        <button class="btn" onclick="APOS.mailSent=true;render()">${APOS.mailSent?'✓ Verstuurd':'Verstuur per e-mail'}</button>
+      </div>
+      ${APOS.mailSent?`<p class="small" style="color:var(--ok)">Groene kaart verzonden naar ${esc(APOS.nieuw.email||'het e-mailadres uit het dossier')} (demo) — ook als de printer het laat afweten, heeft de klant ze op zak.</p>`:''}
+    </div>
+    <button class="btn" onclick="APOS=null;render()">Nieuwe aflevering</button>`; }
+  return `<h1>Aflevering + verzekering</h1><p class="hint">Doel: de klant rijdt verzekerd buiten, de deal is volledig rond vóór die de showroom verlaat.</p><div class="steps">${stepHTML}</div>${body}`;
+};
+function aposGrab2(){ const n=document.getElementById('pa_naam'); if(n) APOS.nieuw.naam=n.value;
+  const e=document.getElementById('pa_email'); if(e) APOS.nieuw.email=e.value;
+  const g=document.getElementById('pa_geb'); if(g) APOS.nieuw.geb=g.value; }
+function aposFilter(v){ APOS.filter=v; render();
+  const el=document.getElementById('pa_zoek'); if(el){ el.focus(); el.setSelectionRange(el.value.length,el.value.length);} }
+function aposKies(id){ aposGrab2(); APOS.klant=id; APOS.offerSent=false; render(); }
+function aposNext1(){ APOS.merk=document.getElementById('pa_merk').value; APOS.value=+document.getElementById('pa_val').value||APOS.value;
+  APOS.plate=document.getElementById('pa_plate').value.trim(); APOS.chassis=document.getElementById('pa_chassis').value.trim();
+  APOS.offerSent=false;
+  const err=document.getElementById('a_err');
+  if(!APOS.merk.trim()){ err.textContent='Vul merk en model in — die komen op de groene kaart.'; return; }
+  if(!APOS.plate && !APOS.chassis){ err.textContent='Zonder kenteken is het chassisnummer verplicht, anders kan de wagen niet ingeschreven worden.'; return; }
+  APOS.step=2; render(); }
+function aposNext2(){ aposGrab2();
+  const err=document.getElementById('a_err');
+  if(!APOS.klant){ err.textContent='Kies eerst een klant (of "Nieuwe klant").'; return; }
+  if(APOS.klant==='nieuw'){
+    if(!APOS.nieuw.naam.trim()){ err.textContent='Vul de naam van de klant in.'; return; }
+    if(!EMAIL_RE.test(APOS.nieuw.email.trim())){ err.textContent='Vul een geldig e-mailadres in (naam@domein.be) — daar sturen we de groene kaart naartoe.'; return; }
+    const a = leeftijd(APOS.nieuw.geb);
+    if(a===null){ err.textContent='Vul de geboortedatum in — nodig voor identificatie en acceptatie.'; return; }
+    if(a<0){ err.textContent='De geboortedatum ligt in de toekomst — controleer de invoer.'; return; }
+    if(a<18){ err.textContent='De verzekeringnemer moet meerderjarig zijn (18+).'; return; }
+    if(a>110){ err.textContent='Controleer de geboortedatum — die lijkt niet te kloppen.'; return; }
+  } else if(APOS.nieuw.email && !EMAIL_RE.test(APOS.nieuw.email.trim())){ err.textContent='Het e-mailadres voor de groene kaart is ongeldig.'; return; }
+  APOS.step=3; render(); }
+function registerOffer(channel, naam, desc, jaar, pct, aanbreng, lease){
+  (DB.offers=DB.offers||[]).push({channel, naam, desc, jaar, pct, aanbreng, lease:!!lease, status:'verstuurd', d:today(), remails:0});
+  logEvent(channel+' mailde een offerte ('+desc+') naar '+naam+' — wacht op handtekening in het klantportaal.');
+  save();
+}
+function posMailOffer(){
+  const bestaand = POS.klant!=='nieuw';
+  const naam = bestaand ? (fam(POS.klant)?.name||'klant') : POS.nieuw.naam;
+  const m = vehMonthly({type:POS.type, value:POS.value, lease:POS.mode==='lease'});
+  registerOffer('fietsenwinkel', naam, POS.label+' '+eur0(POS.value)+(POS.mode==='lease'?' · leasing':''), m*12*(bestaand?1-DB.products.bundel/100:1), DB.products.comm.winkel, bestaand?0:DB.products.aanbreng, POS.mode==='lease');
+  POS.offerSent=true; render();
+}
+function aposMailOffer(){
+  const bestaand = APOS.klant!=='nieuw';
+  const naam = bestaand ? (fam(APOS.klant)?.name||'klant') : APOS.nieuw.naam;
+  const m = vehMonthly({type:'auto', value:APOS.value, lease:false});
+  registerOffer('autodealer', naam, (APOS.merk||'Wagen')+' '+eur0(APOS.value), m*12*(bestaand?1-DB.products.bundel/100:1), DB.products.comm.dealer, bestaand?0:DB.products.aanbreng, false);
+  APOS.offerSent=true; render();
+}
+function aposTeken(){
+  sigOpen('Koper ondertekent','BA-dekking gaat in zodra de handtekening bevestigd is.', sig=>{
+    let f;
+    if(APOS.klant==='nieuw'){
+      f = { id:nid('fam_'), name:APOS.nieuw.naam, status:'offerte', channel:'autodealer', beheerder:'Sofie (autodealer)',
+        members:[{n:APOS.nieuw.naam, r:'volwassene'}], vehicles:[], huidig:[], history:[{d:today(), t:'Gezinspolis gestart bij de autodealer. Aanbrengvergoeding dealer: '+eur(DB.products.aanbreng)+'.'}], signature:null };
+      DB.families.push(f);
+    } else { f = fam(APOS.klant); }
+    f.vehicles.push({id:nid('v'), type:'auto', label:APOS.merk||'Wagen', value:APOS.value, lease:false, plate:APOS.plate||'in aanvraag', chassis:APOS.chassis, who:APOS.klant==='nieuw'?APOS.nieuw.naam:''});
+    f.history.unshift({d:today(), t:'Nieuwe wagen gekocht bij de dealer (Sofie); BA direct actief, voorlopige groene kaart afgeleverd en gemaild.'});
+    const bestond = APOS.klant!=='nieuw';
+    (DB.offers||[]).forEach(o=>{ if(o.channel==='autodealer' && o.naam===f.name && o.status==='verstuurd') o.status='getekend'; });
+    if(f.status!=='actief'){ activate(f, sig, 'autodealer'); }
+    else { logEvent(f.name+' voegde een wagen toe via de autodealer; voorlopige groene kaart aangemaakt. Premie herberekend naar '+eurM(quote(f).total)+'.'); }
+    const mS = vehMonthly({type:'auto', value:APOS.value, lease:false});
+    const jaarS = mS*12*(bestond?1-DB.products.bundel/100:1);
+    (DB.sales=DB.sales||[]).push({channel:'autodealer', famName:f.name, desc:(APOS.merk||'Wagen')+' '+eur0(APOS.value), jaar:jaarS,
+      pct:DB.products.comm.dealer, comm:jaarS*DB.products.comm.dealer/100, aanbreng:bestond?0:DB.products.aanbreng, d:today()});
+    save();
+    APOS.doneFam = f.id; APOS.mailSent=true; APOS.step=5; render();
+  }, ['Identiteit en rijbewijs gecontroleerd (echte flow: eID of itsme)','Klant ontving het informatiedocument (IPID) en de voorwaarden']);
+}
+VIEWS.a_mijn = () => salesView('autodealer','Mijn verkopen & vergoeding',
+  'Uw vergoeding blijft doorlopen, óók wanneer de klant het dossier later bij zijn eigen makelaar onderbrengt: het kanaal dat de polis aanbracht, behoudt zijn aandeel (demo-afspraak, zichtbaar voor alle partijen).');
+VIEWS.a_waarom = () => `<h1>Waarom de verzekering direct afsluiten?</h1>
+  <div class="grid3">
+  <div class="card"><h3>🔑 De deal is pas rond mét verzekering</h3><p>Zonder BA geen inschrijving en geen aflevering. Wie de klant naar een makelaar of website doorstuurt, riskeert uitstel — of een afgesprongen deal.</p></div>
+  <div class="card"><h3>🟩 Groene kaart ter plekke</h3><p>Handtekening → voorlopig verzekeringsbewijs, geldig tot ${plusDays(39)}. De wagen kan meteen ingeschreven worden.</p></div>
+  <div class="card"><h3>💶 Transparante vergoeding</h3><p>${DB.products.comm.dealer}% van de premie, zichtbaar voor alle partijen. Geen constructies, geen discussies achteraf.</p></div>
+  <div class="card"><h3>🔁 Geen kanaalconflict</h3><p>Heeft de klant al een makelaar of een P&V-gezinspolis? Dan voegt u alleen de wagen toe; het bestaande kanaal blijft het dossier beheren. Iedereen ziet dezelfde polis.</p></div>
+  </div>`;
+
+/* ---------- DIRECTIE ---------- */
+const ACTORS = [
+  {id:'gezin',   n:'Het gezin',           icon:'👨‍👩‍👧‍👦', x:470, y:85,
+   geeft:'premie € 100', krijgt:'dekking (€ {SCHADE} schade)',
+   voordeel:'Eén polis voor alle personen en alle vervoermiddelen: geen gaten, geen dubbele dekking, één aanspreekpunt. Transparante premie-opbouw en open marktvergelijking vóór de handtekening. Nieuw voertuig? Toevoegen in plaats van opnieuw shoppen.'},
+  {id:'makelaar',n:'Makelaar',            icon:'🤝', x:800, y:210,
+   geeft:'advies & dossiers', krijgt:'commissie € {COMM_M}',
+   voordeel:'Eén adviesgesprek in plaats van zes polissen beheren. Commissie ({COMM_M}%) op de volledige gezinspremie, elk jaar opnieuw zolang de klant blijft. De transparantie-aanpak wint het vertrouwen en verkort de verkoopcyclus.'},
+  {id:'winkel',  n:'Fietsenwinkel',       icon:'🚲', x:800, y:465,
+   geeft:'nieuwe gezinnen', krijgt:'commissie € {COMM_W} + aanbreng',
+   voordeel:'Verzekering of lease meeverkopen in minder dan vijf minuten aan de kassa, met zichtbare vergoeding ({COMM_W}%) plus een eenmalige aanbrengvergoeding per nieuw gezin. Bestaande P&V-gezinnen: de fiets schuift in de polis — dertig seconden. De winkel wordt een instappunt voor nieuwe gezinspolissen.'},
+  {id:'dealer',  n:'Autodealer',          icon:'🚗', x:470, y:590,
+   geeft:'nieuwe gezinnen', krijgt:'commissie € {COMM_D} + aanbreng',
+   voordeel:'De deal is pas rond mét verzekering: handtekening in de showroom, voorlopige groene kaart ter plekke, wagen meteen ingeschreven. Vergoeding {COMM_D}% — en die blijft, ook als een makelaar het dossier later overneemt. Geen kanaalconflict.'},
+  {id:'werkgever',n:'Werkgever / leasing', icon:'🏭', x:140, y:465, indirect:true,
+   geeft:'leasevoertuigen', krijgt:'geen dubbele dekking',
+   voordeel:'Indirecte partner (geen geldstroom in deze demo). Leasefietsen en bedrijfswagens passen zonder dubbele dekking in de gezinspolis: casco zit in het leasecontract, de polis dekt de persoon (daarom −40% op leasevoertuigen). Mobiliteitsbudgetten worden eenvoudiger — één polis volgt de werknemer.'},
+  {id:'deel',    n:'Deelmobiliteit & OV', icon:'🔄', x:140, y:210, indirect:true,
+   geeft:'deelgebruik', krijgt:'lagere drempel voor hun dienst',
+   voordeel:'Indirecte partner (geen geldstroom in deze demo). Poppy, deelsteps en de trein: de aanbieder verzekert het voertuig, de mobiliteitspolis beschermt de persoon (eigen letsel, franchise-afdekking). De drempel om deelmobiliteit te gebruiken daalt — goed voor die partners én voor duurzame mobiliteit.'},
+  {id:'pv',      n:'P&V',                 icon:'🏢', x:470, y:337,
+   voordeel:'Klantbehoud op elk voertuigmoment: geen keuzemoment meer waarop de klant kan vertrekken (zie Levensloop op de pitchpagina; break-even bij een blijfkans van ± {BE}% bij de huidige korting, indicatief — daaronder wint de gezinspolis). Premievolume per gezin i.p.v. per voertuig, lagere distributiekost via winkels en dealers, en per € 100 premie {MARGEZIN}. Plus een uniek transparantie-merk.'}
+];
+VIEWS.d_eco = () => { const cr = combinedRatio();
+  return `<h1>Het ecosysteem in één beeld</h1>
+  <p class="hint">Elke pijl draagt zijn bedrag per € 100 premie. Klik op een actor (of op het hart) om te zien wat die geeft en krijgt. ${cr<100?'Ontwerpprincipe: <b>niemand verliest</b> — en de balk onderaan bewijst het.':'<b style="color:var(--bad)">Let op: in de huidige schuifstand verliest P&V</b> — de rode balk onderaan toont hoeveel. "Niemand verliest" geldt alleen zolang de combined ratio onder 100% blijft.'}</p>
+  <div class="grid2" style="grid-template-columns:1.4fr 1fr">
+    <div class="card" id="eco">${ecoSVG()}
+      ${geldstroomHTML(null)}</div>
+    <div>
+      <div class="ecodetail" id="ecodetail"><b>Kies een actor</b><p class="small">Tip: begin bij het gezin bovenaan, of klik op het P&amp;V-hart — ${cr<100?'en zie dat beide winnen.':'en kijk wat er in deze schuifstand misloopt.'}</p></div>
+      <div class="flowlegend" style="margin-top:12px">
+        <span><i style="border-color:#870930"></i> premie</span>
+        <span><i style="border-color:#2e8b57"></i> dekking / uitkeringen</span>
+        <span><i style="border-color:#ff6600"></i> commissie</span>
+        <span><i style="border-color:#6f6f6f"></i> klanten, advies & data</span>
+        <span><i style="border-color:#9aa5a8;border-top-style:dashed"></i> indirecte partner</span>
+      </div>
+      <div class="calm">De <b>betaalde stromen</b> kan u in deze demo zelf naspelen: log in als makelaar, winkel of dealer en sluit een polis; log in als klant en onderteken — de cijfers onder "Cijfers &amp; knoppen" bewegen live mee. Werkgever/leasing en deelmobiliteit zijn indirecte partners en vallen buiten de demoscope; hun rol staat in de toelichting.</div>
+    </div>
+  </div>`; };
+/* stuksgewijze benadering door de punten (75%, +91%), (90%, +19%) en (95%, +6%) van het levensloopmodel, geschaald met de korting */
+function levensVoordeel(bk, bu){
+  const basis = bk <= 90 ? Math.exp(0.647 - 0.0315*(bk-75))
+                         : Math.exp(Math.log(1.19) - ((Math.log(1.19)-Math.log(1.06))/5)*(bk-90));
+  return (1-bu)/0.9 * basis - 1;
+}
+function breakEvenBlijfkans(bu){
+  for(let bk=60; bk<=100; bk+=0.25){ if(levensVoordeel(bk,bu) <= 0) return bk; }
+  return 100;
+}
+function ecoVals(){ const p=DB.products;
+  const effSchade = p.schadelast * 0.9 / Math.max(0.05, 1 - p.bundel/100);
+  const bu = p.bundel/100;
+  const be = breakEvenBlijfkans(bu);
+  const marge = 100-effSchade-p.beheer-gewogenComm()-p.overhead;
+  return {SCHADE:effSchade.toFixed(0), COMM_M:p.comm.makelaar, COMM_W:p.comm.winkel, COMM_D:p.comm.dealer,
+          BE:be.toFixed(0), MARGE:Math.abs(marge).toFixed(0),
+          MARGEZIN: marge>=0 ? ('± € '+marge.toFixed(0)+' buffer & marge') : ('<b style="color:var(--bad)">een verlies van € '+Math.abs(marge).toFixed(0)+'</b> — in deze schuifstand is de polis niet houdbaar; zie de rode balk')}; }
+function ecoFill(s){ const v=ecoVals(); return s.replace(/\{(\w+)\}/g,(_,k)=>v[k]??''); }
+function ecoSVG(){
+  const HX=470, HY=337, HR=84, NR=54;
+  const nodes = ACTORS.filter(a=>a.id!=='pv').map(a=>`<g class="econode" onclick="ecoPick('${a.id}')">
+    <circle cx="${a.x}" cy="${a.y}" r="${NR}" fill="#fff" stroke="${a.indirect?'#9aa5a8':'#d9dfe1'}" stroke-width="2" ${a.indirect?'stroke-dasharray="6 5"':''}/>
+    <text x="${a.x}" y="${a.y-6}" text-anchor="middle" font-size="28">${a.icon}</text>
+    <text x="${a.x}" y="${a.y+26}" text-anchor="middle" font-size="13.5" font-weight="600" fill="#2b2b2b">${a.n}</text></g>`).join('');
+  /* twee evenwijdige pijlen per actor (geven/krijgen), zonder kruisingen */
+  const KLEUR_GEEFT = {gezin:'#870930', makelaar:'#6f6f6f', winkel:'#6f6f6f', dealer:'#6f6f6f', werkgever:'#9aa5a8', deel:'#9aa5a8'};
+  const verliesStand = combinedRatio() > 100; /* dekkingspijl kleurt rood zodra de schade boven de premie uitkomt */
+  const KLEUR_KRIJGT = {gezin:verliesStand?'#d13b2f':'#2e8b57', makelaar:'#ff6600', winkel:'#ff6600', dealer:'#ff6600', werkgever:'#9aa5a8', deel:'#9aa5a8'};
+  const lines = ACTORS.filter(a=>a.id!=='pv').map(a=>{
+    const dx=HX-a.x, dy=HY-a.y, d=Math.hypot(dx,dy), ux=dx/d, uy=dy/d;
+    const px=-uy, py=ux, off=18; /* loodrechte offset voor twee parallelle pijlen */
+    const dash = a.indirect ? 'stroke-dasharray="7 6"' : '';
+    const sx1=a.x+ux*NR+px*off, sy1=a.y+uy*NR+py*off, ex1=HX-ux*(HR+6)+px*off, ey1=HY-uy*(HR+6)+py*off; /* actor → hub (geeft) */
+    const sx2=HX-ux*(HR+6)-px*off, sy2=HY-uy*(HR+6)-py*off, ex2=a.x+ux*NR-px*off, ey2=a.y+uy*NR-py*off; /* hub → actor (krijgt) */
+    /* labels verspringen langs de lijn (geeft dicht bij de actor, krijgt dicht bij het hart) zodat ze elkaar nooit raken */
+    const lab = (x1,y1,x2,y2,t,c,frac,sign)=>{ const mx=x1+(x2-x1)*frac+px*sign*20, my=y1+(y2-y1)*frac+py*sign*20;
+      return `<text x="${mx}" y="${my}" text-anchor="middle" font-size="11.5" font-weight="600" fill="${c}" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">${t}</text>`; };
+    return `<line x1="${sx1}" y1="${sy1}" x2="${ex1}" y2="${ey1}" stroke="${KLEUR_GEEFT[a.id]}" stroke-width="2.5" marker-end="url(#arr)" opacity=".85" ${dash}/>
+    ${lab(sx1,sy1,ex1,ey1, ecoFill(a.geeft), KLEUR_GEEFT[a.id], 0.30, 1)}
+    <line x1="${sx2}" y1="${sy2}" x2="${ex2}" y2="${ey2}" stroke="${KLEUR_KRIJGT[a.id]}" stroke-width="2.5" marker-end="url(#arr)" opacity=".85" ${dash}/>
+    ${lab(sx2,sy2,ex2,ey2, ecoFill(a.krijgt), KLEUR_KRIJGT[a.id], 0.30, -1)}`;
+  }).join('');
+  const hub = `<g class="econode" onclick="ecoPick('pv')"><circle cx="${HX}" cy="${HY}" r="${HR}" fill="#870930"/>
+    <text x="${HX}" y="${HY-24}" text-anchor="middle" font-size="22">🏢</text>
+    <text x="${HX}" y="${HY-2}" text-anchor="middle" font-size="14.5" font-weight="700" fill="#fff">P&amp;V · Mobiliteitspolis</text>
+    <text x="${HX}" y="${HY+18}" text-anchor="middle" font-size="11" fill="#f3dde4">één gezinspolis,</text>
+    <text x="${HX}" y="${HY+33}" text-anchor="middle" font-size="11" fill="#f3dde4">volgt de personen</text></g>`;
+  return `<svg viewBox="0 0 940 672" role="img" aria-label="Ecosysteem van de mobiliteitspolis met geldstromen per 100 euro premie">
+    <defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="context-stroke"/></marker></defs>
+    ${lines}${hub}${nodes}</svg>`;
+}
+function ecoPick(id){ const a = ACTORS.find(x=>x.id===id);
+  document.getElementById('ecodetail').innerHTML = `<b>${a.icon} ${esc(a.n)} — wat levert het op?</b>
+  ${a.geeft?`<p class="small" style="margin:4px 0"><b>Geeft:</b> ${ecoFill(a.geeft)} · <b>Krijgt:</b> ${ecoFill(a.krijgt)}</p>`:''}
+  <p>${ecoFill(a.voordeel)}</p>`; }
+VIEWS.d_hoe = () => `<h1>Zo werkt het, van kop tot staart</h1>
+  <p class="hint">Zes stappen — en elke stap kan u nu zelf naspelen in deze demo met de accounts op het aanmeldscherm.</p>
+  <div class="grid3">
+  ${[
+    ['1 · Instap via elk kanaal','Het gezin stapt in waar het toevallig staat: in de fietsenwinkel, bij de autodealer, bij de makelaar of online. Elk kanaal opent dezelfde gezinspolis.','Speel na: log in als Karim (winkel) of Sofie (dealer).'],
+    ['2 · Gezin in plaats van voertuig','We registreren personen (volwassenen en kinderen), daarna pas alles waarmee ze onderweg zijn — ook brommer, leasefiets, deelwagen en trein.','Speel na: log in als Marc, start een adviesgesprek.'],
+    ['3 · Transparante offerte','De premie-opbouw per voertuig, de bundelkorting én de marktvergelijking staan open op het scherm. De klant beslist met alle kaarten op tafel.','Speel na: bekijk "Prijs & vergelijking" als An.'],
+    ['4 · Digitale handtekening','Eén handtekening — thuis, in kantoor, op de tablet in de winkel of showroom — en de polis is meteen actief.','Speel na: onderteken de offerte als An.'],
+    ['5 · Uitrol zonder wachttijd','Polisblad, verzekeringsbewijzen en voorlopige groene kaart worden direct aangemaakt en staan in het klantportaal. Het activiteitenlog registreert alles.','Speel na: bekijk "Mijn documenten" als An, en het log als Els.'],
+    ['6 · Een leven lang meegroeien','Nieuw voertuig = toevoegen, geen nieuwe polis. Het keuzemoment waarop klanten vandaag vertrekken, verdwijnt — dat is de kern van de business case.','Speel na: voeg als An een voertuig toe; zie de premie live mee bewegen.']
+  ].map(s=>`<div class="card"><h3>${s[0]}</h3><p>${s[1]}</p><p class="small">▶ ${s[2]}</p></div>`).join('')}
+  </div>
+  <div class="note">De volledige cijfermatige onderbouwing (business case, levensloopmodel, concurrentieanalyse) staat op de <a href="index.html">pitchpagina</a> — tabbladen Business case, Levensloop en Concurrentie.</div>`;
+VIEWS.d_kpi = () => { const act=DB.families.filter(f=>f.status==='actief');
+  const vol=act.reduce((s,f)=>s+quote(f).total,0); const cr=combinedRatio(); const p=DB.products;
+  const comm = {makelaar:0, fietsenwinkel:0, autodealer:0};
+  act.forEach(f=>{ const q=quote(f).total;
+    if(f.channel==='makelaar') comm.makelaar+=q*p.comm.makelaar/100;
+    if(f.channel==='fietsenwinkel') comm.fietsenwinkel+=q*p.comm.winkel/100;
+    if(f.channel==='autodealer') comm.autodealer+=q*p.comm.dealer/100; });
+  const marge = Math.max(0, 100-cr);
+  return `<h1>Cijfers & knoppen</h1>
+  <p class="hint">Links: de live democijfers (elke polis uit de andere portalen telt mee). Rechts: úw knoppen — dezelfde parameters als bij productbeheer, met het effect meteen doorgerekend naar de doelschaal uit de business case.</p>
+  <div class="kpis">
+    <div class="kpi"><b>${act.length}</b><span>actieve gezinspolissen (demo)</span></div>
+    <div class="kpi"><b>${eur(vol)}</b><span>premievolume / maand (demo-polissen — schaalt niet met uw schuiven)</span></div>
+    <div class="kpi"><b id="dk_tile_cr" style="color:${cr<95?'var(--ok)':cr<=100?'var(--partial)':'var(--bad)'}">${cr.toFixed(0)}%</b><span>combined ratio — beweegt live mee met uw schuiven</span></div>
+    <div class="kpi"><b id="dk_tile_bk">${eur(bundelKost())}</b><span>bundelkorting / maand — de prijs van het klantbehoud</span></div>
+  </div>
+  <div class="grid2">
+    <div class="card"><h2>Uw knoppen — met effect op schaal</h2>
+      <div class="sl"><label>Werkelijke schadelast <output id="dk_s">${p.schadelast}%</output></label>
+        <input type="range" min="40" max="95" value="${p.schadelast}" oninput="dirkSet('schadelast',this.value)"></div>
+      <div class="sl"><label>Bundelkorting <output id="dk_b">${p.bundel}%</output></label>
+        <input type="range" min="0" max="25" value="${p.bundel}" oninput="dirkSet('bundel',this.value)"></div>
+      <div class="sl"><label>Blijfkans bij een nieuw voertuig (losse polissen) <output id="dk_p">${p.blijfkans??75}%</output></label>
+        <input type="range" min="60" max="100" value="${p.blijfkans??75}" oninput="dirkSet('blijfkans',this.value)"></div>
+      <div class="calm" id="dk_out"></div>
+      <button class="btn sec" style="margin-top:8px" onclick="dirkReset()">Terug naar het basisscenario (62% / 10% / 75%)</button>
+      <p class="small">Doelschaal uit de business case op de pitchpagina: 400.000 gezinnen in de doelgroep × 6% afsluitgraad = 24.000 klanten in jaar 5, à € 68/gezin/maand. Hier rekenen we de eindstand een vol jaar door (± € 19,6 mln premie); de pitch toont ± € 17,6 mln in jaar 5 omdat klanten daar gespreid over het jaar instappen. Demo-aannames; cannibalisatie van bestaande P&amp;V-klanten en acquisitiekost zitten er nog niet in — dat is de volgende rekenopdracht.</p></div>
+    <div class="card"><h2>Vergoedingen per kanaal (per maand, demo)</h2>
+      <table class="tbl"><tbody>
+      <tr><td>🤝 Makelaar (${p.comm.makelaar}%)</td><td class="r">${eur(comm.makelaar)}</td></tr>
+      <tr><td>🚲 Fietsenwinkel (${p.comm.winkel}%)</td><td class="r">${eur(comm.fietsenwinkel)}</td></tr>
+      <tr><td>🚗 Autodealer (${p.comm.dealer}%)</td><td class="r">${eur(comm.autodealer)}</td></tr></tbody></table>
+      <p class="small">Dezelfde percentages staan als neutrale regel op elk klantscherm — distributiekost is hier geen geheim maar een verkoopargument.</p>
+      <h2 style="margin-top:14px">De aannames die het verschil maken</h2>
+      <ul>
+      <li><b>Blijfkans bij een nieuw voertuig</b> is dé gevoelige aanname: op 75% is de extra levenswaarde ± +91%, op 90% nog ± +19% (beide bij 10% korting). Het break-evenpunt beweegt mee met de bundelkorting — het exacte cijfer staat bij uw schuiven hiernaast. Dé datavraag voor de organisatie: hoeveel klanten verliezen we echt per voertuigmoment?</li>
+      <li><b>Klantwaarde staat in premie, niet in marge.</b> De bundelkorting-schuif hiernaast verrekent dat live: hoe hoger de korting, hoe lager de extra klantwaarde en hoe <b>lager</b> het break-evenpunt (de losse aanpak wint dan sneller).</li>
+      <li><b>Alle premies in deze demo zijn fictief.</b> Vóór lancering: actuariële tarifering, juridische toetsing en de cannibalisatie-som.</li></ul></div>
+  </div>`;
+};
+AFTER.d_kpi = () => dirkCalc();
+function dirkReset(){ DB.products.schadelast=62; DB.products.bundel=10; DB.products.blijfkans=75; save(); render(); }
+function dirkSet(k,v){ DB.products[k]=+v; save();
+  const map={schadelast:'dk_s', bundel:'dk_b', blijfkans:'dk_p'}; document.getElementById(map[k]).textContent=v+'%'; dirkCalc(); }
+function dirkCalc(){ const el=document.getElementById('dk_out'); if(!el) return;
+  const p=DB.products, cr=combinedRatio();
+  const jaarPremie = 24000*68*12;
+  const res = jaarPremie*(1-cr/100);
+  const bk = p.blijfkans??75, bu = p.bundel/100;
+  const voordeel = levensVoordeel(bk, bu);
+  const be = breakEvenBlijfkans(bu);
+  const kleur = cr<95?'var(--ok)':cr<=100?'var(--partial)':'var(--bad)';
+  el.innerHTML = `Combined ratio: <b style="color:${kleur}">${cr.toFixed(0)}%</b> → technisch resultaat op doelschaal (24.000 klanten): <b style="color:${res>=0?'var(--ok)':'var(--bad)'}">${(res>=0?'':'−')+eur0(Math.abs(res))}/jaar</b>.<br>
+  <span class="small">Extra klantwaarde gezinspolis t.o.v. losse polissen bij blijfkans ${bk}% en bundelkorting ${p.bundel}%: <b>${voordeel>=0?'+':''}${(voordeel*100).toFixed(0)}%</b>. Break-evenblijfkans bij deze korting: <b>± ${be.toFixed(0)}%</b> (indicatief) — daarboven wint de losse aanpak (benadering uit het levensloopmodel; de aanname zelf vraagt het blijfkansonderzoek).</span>`;
+  const t1 = document.getElementById('dk_tile_cr');
+  if(t1){ t1.textContent = cr.toFixed(0)+'%'; t1.style.color = kleur; }
+  const t2 = document.getElementById('dk_tile_bk');
+  if(t2){ t2.textContent = eur(bundelKost()); } }
+VIEWS.d_tra = () => `<h1>Transparantie als strategie</h1>
+  <p class="hint">Niet een feature, maar het businessmodel: iedereen ziet dezelfde prijzen, dezelfde vergelijking en dezelfde vergoedingen.</p>
+  <div class="grid3">
+    <div class="card"><h3>👩 Voor de klant</h3><p>Premie-opbouw per voertuig, bundelkorting en marktvergelijking (met bronnen) staan vóór de handtekening open op het scherm. Wie niets verstopt, hoeft geen kleine lettertjes.</p></div>
+    <div class="card"><h3>🤝 Voor de kanalen</h3><p>Makelaar, winkel en dealer zien elkaars rol en hun eigen vergoeding — en die is ook voor de klant zichtbaar. Geen verborgen marges betekent: geen kanaalconflict en geen vertrouwensbreuk.</p></div>
+    <div class="card"><h3>🏢 Voor P&V</h3><p>Transparantie is in de verzekeringsmarkt zeldzaam — en dus een merkpositie. Ze past bovendien bij de coöperatieve wortels van P&V: eerlijk delen van waarde tussen klant, kanaal en verzekeraar.</p></div>
+  </div>
+  ${(()=>{ const f=fam('fam_peeters'); if(!f) return '';
+    const q=quote(f); const nu=f.huidig.reduce((s,h)=>s+h.v,0);
+    return `<div class="card"><h2>Het geheel, in euro's — voorbeeldgezin Peeters</h2>
+    <p class="hint">≈ ${((1-q.total/Math.max(1,nu))*100).toFixed(0)}% minder premie dan vandaag, mét ruimere dekking — op basis van de eigen opgave van het gezin.</p>
+    <div class="scrollx"><table class="tbl" style="max-width:640px"><tbody>
+    <tr><td>Vandaag: losse polissen (eigen opgave), mét gaten (geen eigen letsel, sportfietsen en brommer deels onverzekerd)</td><td class="r">${eur(nu*12)}/jaar</td></tr>
+    <tr><td>Mobiliteitspolis: alle ${f.vehicles.length} vervoermiddelen en ${f.members.length} personen, zonder de gaten</td><td class="r">${eur(q.total*12)}/jaar</td></tr>
+    <tr class="tot"><td>Verschil — mét ruimere dekking</td><td class="r" style="color:var(--ok)">${eur((nu-q.total)*12)}/jaar</td></tr>
+    </tbody></table></div>
+    <p class="small">Op losse rijen wint P&amp;V niet altijd (Ethias is goedkoper voor een kale fietspolis of kale BA — zie hieronder). Op het geheel wél: dat is de claim "ze wint op het geheel", hier in één getal in plaats van in woorden.</p></div>`; })()}
+  <div class="card"><h2>Niet alleen beschreven — hier is ze, de vergelijking zelf</h2>
+    ${compareHTML(true)}
+    <h3 style="margin-top:14px">En de vergoedingen, open en bloot</h3>
+    <table class="tbl" style="max-width:480px"><tbody>
+      <tr><td>🤝 Makelaar</td><td class="r">${DB.products.comm.makelaar}% doorlopend</td></tr>
+      <tr><td>🚲 Fietsenwinkel</td><td class="r">${DB.products.comm.winkel}% + ${eur(DB.products.aanbreng)} aanbreng</td></tr>
+      <tr><td>🚗 Autodealer</td><td class="r">${DB.products.comm.dealer}% + ${eur(DB.products.aanbreng)} aanbreng</td></tr>
+      <tr><td>💻 Online/direct</td><td class="r">${DB.products.comm.online}%</td></tr></tbody></table>
+    <p class="small">Dezelfde regel staat op élk klantscherm ("In uw premie zit x% vergoeding voor het verkoopkanaal"). Let op het IDD-/distributiegesprek dat hierbij hoort: makelaars moeten hier vooraf in meegenomen worden.</p>
+  </div>
+  <div class="card"><h2>Waar u het in de demo ziet</h2>
+    <ul>
+      <li>Klantportaal → <b>Prijs & vergelijking</b>: volledige premie-opbouw, de kanaalvergoeding als aparte regel, en de marktvergelijking standaard opengeklapt in de offerte.</li>
+      <li>Winkel & dealer → stap <b>"Prijs — open kaarten"</b>: marktstaafjes die de klant mee ziet, inclusief waar de concurrent goedkoper is (Ethias bij de gewone fiets — met een ✓ "goedkoopste" bij de concurrent).</li>
+      <li>Makelaar → offerte met dezelfde cijfers; het verkoopscript staat in een apart paneel "alleen voor u".</li>
+      <li>Beheer & directie → combined ratio (gewogen naar kanaalmix), bundelkortingkost en vergoedingen per kanaal, live.</li>
+    </ul>
+    <div class="calm">Durven tonen waar je níet de goedkoopste bent, is wat de vergelijking geloofwaardig maakt. De polis wint niet op elke rij — ze wint op het geheel: één contract, geen gaten, geen keuzemomenten.</div>
+  </div>`;
+
+/* ================= init ================= */
+load(); renderLogin();
+const remembered = sessionStorage.getItem('mobipolis_user');
+if(remembered){ const a = ACCOUNTS.find(x=>x.user===remembered); if(a){ CUR=a; enterApp(); } }
+</script>
+</body>
+</html>
