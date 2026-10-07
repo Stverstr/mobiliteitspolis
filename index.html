@@ -112,6 +112,21 @@ footer{padding:0;margin-top:40px}
 @media (max-width:760px){.cfg,.bc{grid-template-columns:minmax(0,1fr)}.row input[type=number]{width:80px}}
 .cfg>*,.bc>*,.panel{min-width:0}
 .row input[type=text]{min-width:0}
+/* één geheel met de demo-omgeving: hero-chips, visual en persona-kaarten */
+.usps{display:flex;gap:10px;flex-wrap:wrap;margin:20px 0 0;position:relative}
+.usp{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:7px 16px;color:#fff;font-size:.92rem;font-weight:600}
+.usp i{font-style:normal;margin-right:6px}
+.heroviz{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin:26px 0 8px}
+.heroviz svg{width:100%;height:auto;display:block}
+.personas{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;margin:18px 0 8px}
+@media(max-width:1100px){.personas{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:640px){.personas{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.pcard{background:#fff;border:2px solid var(--line);border-radius:12px;padding:14px 10px;text-align:center;display:flex;flex-direction:column;gap:6px;align-items:center;min-width:0;text-decoration:none}
+.pcard:hover{border-color:var(--orange)}
+.pcard .avatar{flex:none;width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;background:var(--mist)}
+.pcard b{display:block;color:var(--ink);font-size:.98rem}
+.pcard small{color:var(--muted);display:block;font-size:.78rem;line-height:1.35}
+.pcard .lg{background:var(--mist);border-radius:999px;padding:2px 10px;font-size:.78rem;color:var(--burgundy);font-weight:700;margin-top:2px}
 .bundle{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-top:1px solid var(--line);color:var(--ink)}
 .bundle:first-child{border-top:0}
 .bundle b{font-family:var(--head);font-size:1.2rem;color:var(--burgundy);white-space:nowrap}
@@ -134,13 +149,49 @@ footer{padding:0;margin-top:40px}
 <body>
 <header><div class="wrap">
   <h1>Eén verzekering voor alles waarmee uw gezin onderweg is</h1>
-  <p class="lead">Auto, fiets, e-bike of speedpedelec: vandaag heeft elk voertuig zijn eigen polis, en daartussen vallen soms gaten. Ontdek in een paar klikken hoe goed uw gezin echt beschermd is, en wat één mobiliteitspolis voor u zou veranderen.</p>
-  <p style="position:relative;margin:0 0 36px"><a href="app.html" style="display:inline-block;background:var(--orange);color:#fff;text-decoration:none;font-weight:600;border-radius:6px;padding:10px 20px">Probeer de demo-omgeving (alle rollen) →</a></p>
+  <p class="lead">Vandaag krijgt elk voertuig zijn eigen polis: auto, brommer, e-bike, speedpedelec… Daartussen vallen gaten, en elk nieuw voertuig is een moment waarop de klant vertrekt. De mobiliteitspolis draait het om: <b style="color:#fff">één gezinspolis die de personen volgt</b> — van de eerste fiets tot de mobilhome — en die <b style="color:#fff">radicaal open kaart speelt</b> over prijzen, vergoedingen én concurrenten.</p>
+  <div class="usps" style="margin-bottom:28px">
+    <span class="usp"><i>🧍</i>Volgt personen, niet voertuigen</span>
+    <span class="usp"><i>🔁</i>Nieuw voertuig = toevoegen, geen nieuw contract</span>
+    <span class="usp"><i>🔍</i>Open kaarten: ook waar de concurrent goedkoper is</span>
+  </div>
+  <p style="position:relative;margin:0 0 36px"><a href="app.html" style="display:inline-block;background:var(--orange);color:#fff;text-decoration:none;font-weight:600;border-radius:6px;padding:10px 20px">Stap binnen in de demo-omgeving →</a> <a href="#demo" style="color:#f3dde4;margin-left:14px">of kies hieronder meteen een rol ↓</a></p>
   </div>
   <div class="marking" aria-hidden="true"></div>
 </header>
 
 <main class="wrap">
+  <div class="heroviz">
+    <h2>Waar kijkt u naar — en waarom is dit anders?</h2>
+    <p class="hint">Links het model van vandaag, rechts de mobiliteitspolis. Zelfde gezin, ander vertrekpunt. Daaronder verkent u het concept zelf, tab per tab — en stapt u via een persona de werkende demo in.</p>
+    <svg viewBox="0 0 1040 330" role="img" aria-label="Vandaag: losse polissen per voertuig met gaten. Mobiliteitspolis: één gezinspolis rond de personen.">
+      <text x="235" y="32" text-anchor="middle" font-size="17" font-weight="700" fill="#4d4d4d">VANDAAG: de polis volgt het voertuig</text>
+      <g font-size="30" text-anchor="middle">
+        <g><rect x="40" y="60" width="110" height="96" rx="10" fill="#f4f4f4" stroke="#d9dfe1"/><text x="95" y="102">🚗</text><text x="95" y="136" font-size="11.5" fill="#6f6f6f">polis 1 + omnium</text></g>
+        <g><rect x="180" y="60" width="110" height="96" rx="10" fill="#f4f4f4" stroke="#d9dfe1"/><text x="235" y="102">🛵</text><text x="235" y="136" font-size="11.5" fill="#6f6f6f">polis 2 (BA)</text></g>
+        <g><rect x="320" y="60" width="110" height="96" rx="10" fill="#f4f4f4" stroke="#d9dfe1"/><text x="375" y="102">⚡</text><text x="375" y="136" font-size="11.5" fill="#6f6f6f">polis 3 (lease?)</text></g>
+        <g><rect x="40" y="176" width="110" height="96" rx="10" fill="#fff" stroke="#d13b2f" stroke-dasharray="6 5"/><text x="95" y="218">🚴</text><text x="95" y="252" font-size="11.5" fill="#d13b2f">onverzekerd</text></g>
+        <g><rect x="180" y="176" width="110" height="96" rx="10" fill="#fff" stroke="#d13b2f" stroke-dasharray="6 5"/><text x="235" y="218">🤕</text><text x="235" y="252" font-size="11.5" fill="#d13b2f">eigen letsel: gat</text></g>
+        <g><rect x="320" y="176" width="110" height="96" rx="10" fill="#fff" stroke="#d13b2f" stroke-dasharray="6 5"/><text x="375" y="218">🔄</text><text x="375" y="252" font-size="11.5" fill="#d13b2f">deelauto &amp; trein: gat</text></g>
+      </g>
+      <text x="235" y="296" text-anchor="middle" font-size="13.5" fill="#d13b2f" font-weight="600">6 losse polissen, met gaten ertussen</text>
+      <text x="235" y="316" text-anchor="middle" font-size="13.5" fill="#d13b2f" font-weight="600">elk nieuw voertuig = keuzemoment om te vertrekken</text>
+      <g><line x1="462" y1="170" x2="548" y2="170" stroke="#ff6600" stroke-width="5"/><path d="M548,158 L574,170 L548,182 z" fill="#ff6600"/></g>
+      <text x="805" y="32" text-anchor="middle" font-size="17" font-weight="700" fill="#870930">DE MOBILITEITSPOLIS: de polis volgt de personen</text>
+      <circle cx="805" cy="178" r="118" fill="none" stroke="#870930" stroke-width="3"/>
+      <circle cx="805" cy="178" r="118" fill="#870930" opacity=".05"/>
+      <text x="805" y="170" text-anchor="middle" font-size="42">👨‍👩‍👧‍👦</text>
+      <text x="805" y="206" text-anchor="middle" font-size="14" font-weight="700" fill="#870930">het gezin</text>
+      <text x="805" y="224" text-anchor="middle" font-size="11.5" fill="#6f6f6f">één contract, levenslang</text>
+      <g font-size="25" text-anchor="middle">
+        <text x="805" y="52">🚗</text><text x="906" y="98">🛵</text><text x="938" y="188">⚡</text>
+        <text x="906" y="272">🚴</text><text x="805" y="318">🚆</text><text x="704" y="272">🔄</text>
+        <text x="672" y="188">🛴</text><text x="704" y="98">🚲</text>
+      </g>
+    </svg>
+    <p class="hint" style="margin-top:6px;color:var(--ok);font-weight:600">Alles binnen de cirkel is gedekt — schade aan anderen, eigen letsel én pech. Een nieuw vervoermiddel schuift er gewoon bij, met bundelvoordeel in plaats van een nieuwe onderhandeling.</p>
+  </div>
+
   <div class="tabs" role="tablist">
     <button class="tab" role="tab" aria-selected="true" aria-controls="v-gezin" id="t-gezin">Gezinscheck</button>
     <button class="tab" role="tab" aria-selected="false" aria-controls="v-bc" id="t-bc">Business case</button>
@@ -279,6 +330,19 @@ footer{padding:0;margin-top:40px}
   </section>
 
   <p class="note">Illustratie met vereenvoudigde dekkingsregels en fictieve cijfers. Geen productinformatie of advies.</p>
+  <section id="demo" style="margin-top:44px">
+    <h2 style="font-size:1.5rem">Stap binnen in de demo-omgeving</h2>
+    <p class="hint">Zes stakeholders, zes portalen, één polis. Klik op een rol en u wordt meteen aangemeld — van offerte tot digitale handtekening en polisuitrol. Alle gegevens en premies zijn fictief.</p>
+    <div class="personas">
+      <a class="pcard" href="app.html?user=an"><span class="avatar">👩</span><b>An Peeters</b><small>Eindklant — moeder van het gezin Peeters</small><span class="lg">an · demo</span></a>
+      <a class="pcard" href="app.html?user=marc"><span class="avatar">🤝</span><b>Marc</b><small>Verzekeringsmakelaar — adviseert en verkoopt</small><span class="lg">marc · demo</span></a>
+      <a class="pcard" href="app.html?user=els"><span class="avatar">🏢</span><b>Els</b><small>Productbeheerder mobiliteit bij P&amp;V</small><span class="lg">els · demo</span></a>
+      <a class="pcard" href="app.html?user=karim"><span class="avatar">🚲</span><b>Karim</b><small>Fietsverkoper — verkoopt lease &amp; verzekering mee</small><span class="lg">karim · demo</span></a>
+      <a class="pcard" href="app.html?user=sofie"><span class="avatar">🚗</span><b>Sofie</b><small>Autoverkoper — sluit de verzekering direct af</small><span class="lg">sofie · demo</span></a>
+      <a class="pcard" href="app.html?user=dirk"><span class="avatar">📊</span><b>Dirk</b><small>Beslissingsnemer — directiecomité P&amp;V</small><span class="lg">dirk · demo</span></a>
+    </div>
+    <p class="hint">Liever eerst het aanmeldscherm zien? <a href="app.html">Open de demo-omgeving zonder rol</a>.</p>
+  </section>
 </main>
 <footer class="wrap"><div class="marking" aria-hidden="true"></div></footer>
 

@@ -169,6 +169,7 @@ main{padding:24px 0 60px}
       <span class="usp"><i>🔁</i>Nieuw voertuig = toevoegen, geen nieuw contract</span>
       <span class="usp"><i>🔍</i>Open kaarten: ook waar de concurrent goedkoper is</span>
     </div>
+    <p class="small" style="margin-top:16px"><a href="index.html" style="color:#fff">← Het volledige verhaal: Gezinscheck, business case, levensloop en concurrentie</a></p>
   </div></div>
   <div class="marking"></div>
   <div class="wrap">
@@ -232,6 +233,7 @@ main{padding:24px 0 60px}
     <span class="who">
       <span class="avatar" id="whoavatar"></span>
       <span id="whoname"></span>
+      <a href="index.html" style="border:1px solid rgba(255,255,255,.5);color:#fff;border-radius:6px;padding:5px 12px;font-size:.85rem;text-decoration:none">Pitch &amp; cijfers</a>
       <button type="button" onclick="logout()">Wissel van rol</button>
       <button type="button" onclick="resetDemo()">Demo resetten</button>
     </span>
@@ -1504,8 +1506,14 @@ VIEWS.d_tra = () => `<h1>Transparantie als strategie</h1>
 
 /* ================= init ================= */
 load(); renderLogin();
-const remembered = sessionStorage.getItem('mobipolis_user');
-if(remembered){ const a = ACCOUNTS.find(x=>x.user===remembered); if(a){ CUR=a; enterApp(); } }
+/* één geheel met de pitchpagina: een persona-kaart daar logt hier meteen in via ?user=... */
+const qsUser = (new URLSearchParams(location.search).get('user')||'').toLowerCase();
+const qsAcc = qsUser ? ACCOUNTS.find(x=>x.user===qsUser) : null;
+if(qsAcc){ CUR = qsAcc; sessionStorage.setItem('mobipolis_user', qsAcc.user); enterApp(); }
+else {
+  const remembered = sessionStorage.getItem('mobipolis_user');
+  if(remembered){ const a = ACCOUNTS.find(x=>x.user===remembered); if(a){ CUR=a; enterApp(); } }
+}
 </script>
 </body>
 </html>
